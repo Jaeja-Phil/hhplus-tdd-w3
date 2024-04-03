@@ -6,70 +6,75 @@
 ```sql
 Table users as U {
   id uuid [pk]
-  balance int [default: 0]
+  balance decimal [not null, default: 0] 
 }
 
-enum balance_types {
-  CHARGE
-  USE
+enum token_statuses {
+  IN_QUEUE
+  IN_PROGRESS
+  EXPIRED
 }
-Table user_balance_histories as UBH {
+
+Table user_queue_tokens as UQT {
   id bigint [pk]
   user_id uuid [ref: > U.id]
-  balance_type balance_types [not null]
-  amount int [not null]
-  owner_id bigint [note: '사용처 테이블 id']
-  owner_type varchar [note: '사용처 테이블 모델명']
+  token varchar [not null, unique, note: '유저의 id와 생성 시간을 합친 값을 MD5하여 만듬']
+  status token_statuses [not null, default: `token_statuses.IN_QUEUE`]
 }
 
 Table concerts as C {
   id bigint [pk]
-  name varchar
+  name varchar [not null]
 }
 
-Table concert_dates as CD {
+Table concert_performances as CP {
   id bigint [pk]
   concert_id bigint [ref: > C.id]
-  max_seats int [default: 0, note: '최대 수용 인원수']
-  date datetime [default: 'now()', note: '콘서트 실행 날짜 및 시간']
+  performance_datetime datetime [not null, default: `now()`]
+  max_seats int [not null, default: 0]
 }
 
-Table concert_date_seats as CDS {
+Table performance_seats as PS {
   id bigint [pk]
-  concert_date_id bigint [ref: > CD.id]
-  seat_number int [default: 0]
-  user_id uuid [null, ref: > U.id]
-  reserved bool [default: false]
+  concert_performance_id bigint [ref: > CP.id]
+  seat_number int [not null, default: 0]
+  user_id uuid [null, ref: > U.id, note: '좌석을 예약 성공한 유저']
+  booked boolean [not null, default: false]
 }
 
-Table user_tokens as UT {
+Table performance_seat_book_info as PSBI {
   id bigint [pk]
-  user_id uuid [ref: > U.id]
-  token varchar
+  performance_seat_id bigint [ref: - PS.id]
+  token varchar [null, note: 'performance_seat 생성후 시도된 좌석 예약이 없을 경우 null 가능']
+  book_attempt_at datetime [null, note: '좌석 예약 대기를 걸어둔 시간']
+  book_success_at datetime [null, note: '좌석 예약에 성공한 시간']
 }
 
-enum queue_progresses {
-  WAITING
-  IN_PROGRESS
-  CONFIRMED
-  FORFEITED
-}
-
-Table concert_date_seat_queues as CDSQ {
+Table performance_seat_book_logs as PSBL {
   id bigint [pk]
-  concert_date_seat_id bigint [ref: > CDS.id]
-  user_token_id bigint [ref: > UT.id]
-  progress queue_progresses [not null]
+  performance_seat_id bigint [ref: > PS.id]
+  token varchar [not null, note: '예약 시도를 위해 사용한 대기열 토큰']
+  created_at datetime [not null, default: `now()`]
+  updated_at datetime [not null, default: `now()`]
 }
 ```
 
 ## 2. Sequence Diagram
 
-![Sequence Diagram](static/sequence-diagram.png)
+### 대기열 토큰 발급
+
+![create-user-token-sequence-diagram](static/create-user-token-sequence-diagram.png "대기열 토큰 발급")
+
+### 좌석 예약 요청
+
+![seat-booking-flow-sequence-diagram](static/seat-booking-flow-sequence-diagram.png "좌석 예약 요청")
+
 
 ## 3. API 명세서
 
-### 대기열 토큰 발급: POST /user_tokens
+### 토큰 없이 사용 가능 API 목록
+
+#### 대기열 토큰 발급: POST /user_queue_tokens
 - Request
   - user_id: UUID
   - Content-Type: application/json
@@ -85,7 +90,7 @@ Table concert_date_seat_queues as CDSQ {
     - Body:
       ```
       {
-        "user_token": "TOKEN"
+        "token": "TOKEN"
       }
       ```
   - 400 Bad Request
@@ -98,21 +103,89 @@ Table concert_date_seat_queues as CDSQ {
       ```
     - explanation
       - `user_id`에 해당하는 사용자가 존재하지 않음
-  - 409 Conflict
+- Note
+  - 이후 사용되는 API 호출 시, `token`을 헤더에 `X-Reservation-Token`으로 전달해야 함
+
+#### 유저 잔액 충전: POST /users/{user_id}/charge
+- Request
+  - user_id: UUID
+  - amount: Decimal
+  - Content-Type: application/json
+  - Header: X-Reservation-Token: {token}
+  - Body:
+    ```json
+    {
+      "amount": 100.0
+    }
+    ```
+- Response
+  - 200 OK
     - Content-Type: application/json
     - Body:
       ```
       {
-        "message": "User already has a token"
+        "result": true
+      }
+      ```
+  - 404 Not Found
+    - Content-Type: application/json
+    - Body:
+      ```
+      {
+        "message": "User not found"
       }
       ```
     - explanation
-      - `user_id`에 해당하는 사용자가 이미 대기열 토큰을 발급받은 상태 (대기열 토큰은 한 사용자당 하나만 발급 가능)
-- Note
-  - 이후 사용되는 API 호출 시, `token`을 헤더에 `X-Reservation-Token`으로 전달해야 함
+      - `user_id`에 해당하는 사용자가 존재하지 않음
 
-### 공통 response
-- 403 Forbidden
+#### 유저 정보 조회 (잔액 조회, 예약 성공한 좌석 조회시 사용): GET /users/{user_id}
+- Request
+  - user_id: UUID
+  - Content-Type: application/json
+  - Header: X-Reservation-Token: {token}
+  - Body: None
+- Response
+  - 200 OK
+    - Content-Type: application/json
+    - Body:
+      ```
+      {
+        "id": "UUID",
+        "balance": 100.0,
+        "booked_performance_seats": [
+          {
+            "id": 1,
+            "seat_number": 1,
+            "book_success_at": "2024-04-01T00:00:00"
+            "concert_performance": {
+              "id": 1,
+              "concert": {
+                "id": 1,
+                "name": "콘서트명"
+              },
+              "performance_datetime": "2024-04-01T00:00:00"
+            }
+          }
+        ]
+      }
+      ```
+  - 404 Not Found
+    - Content-Type: application/json
+    - Body:
+      ```
+      {
+        "message": "User not found"
+      }
+      ```
+    - explanation
+      - `user_id`에 해당하는 사용자가 존재하지 않음
+
+---
+
+### 토큰이 필요한 API 목록
+
+#### 공통 response
+- 401 Unauthorized
   - Content-Type: application/json
   - Body:
     ```
@@ -121,9 +194,9 @@ Table concert_date_seat_queues as CDSQ {
     }
     ```
   - explanation
-    - `token`이 유효하지 않음 (대기열 토큰이 아니거나, 만료됨) 
+    - `token`이 유효하지 않음 
 
-### 대기열 토큰으로 정보 조회: GET /user_tokens/{token}
+#### 대기열 토큰으로 정보 조회: GET /user_queue_tokens/token_info
 - Request
   - token: String
   - Content-Type: application/json
@@ -136,17 +209,17 @@ Table concert_date_seat_queues as CDSQ {
       ```
       {
         "user_id": "UUID",
-        "reserving_concert": { // null if not reserving
-          "concert_id": 1,
-          "concert_name": "콘서트명",
-          "concert_date": "2024-04-01T00:00:00",
-          "seat_number": 1,
-          "order_in_queue": 1
+        "status": "one of (IN_QUEUE, IN_PROGRESS, EXPIRED)",
+        "performance_seat_book_info": { // nullable
+          "id": 1,
+          "performance_seat_id": 1,
+          "book_attempt_at": "2024-04-01T00:00:00",
+          "book_success_at": null
         }
       }
       ```
 
-### 콘서트 목록 조회: GET /concerts
+#### 콘서트 목록 조회: GET /concerts
 - Request
   - Content-Type: application/json
   - Header: X-Reservation-Token: {token}
@@ -164,7 +237,7 @@ Table concert_date_seat_queues as CDSQ {
       ]
       ```
 
-### 콘서트 날짜별 좌석 조회: GET /concerts/{concert_id}/available_concert_dates
+#### 콘서트 예약 가능 날짜 조회: GET /concert_performances?concert_id={concert_id}
 - Request
   - concert_id: Long
   - Content-Type: application/json
@@ -180,7 +253,7 @@ Table concert_date_seat_queues as CDSQ {
           "id": 1,
           "concert_id": 1,
           "max_seats": 50,
-          "date": "2024-04-01T00:00:00"
+          "performance_datetime": "2024-04-01T00:00:00"
         }
       ]
       ```
@@ -195,11 +268,11 @@ Table concert_date_seat_queues as CDSQ {
     - explanation
       - `concert_id`에 해당하는 콘서트가 존재하지 않음
 - Note
-  - `seats`는 해당 콘서트 날짜에 대한 총 좌석 수
-  - `date`는 콘서트 날짜 및 시간
+  - `max_seats`는 해당 콘서트 날짜에 대한 총 좌석 수
+  - `performance_datetime`은 콘서트 날짜 및 시간
   - 빈 목록일 경우 해당 콘서트에 대한 예약이 모두 완료되었거나 예약이 불가능한(예: 공연 시작 시간이 지난 경우) 상태
 
-### 예약 가능한 좌석 조회: GET /concert_dates/{concert_date_id}/available_seat_numbers
+#### 예약 가능한 좌석 조회: GET /performance_seats?concert_date_id={concert_date_id}
 - Request
   - concert_date_id: Long
   - Content-Type: application/json
@@ -211,9 +284,8 @@ Table concert_date_seat_queues as CDSQ {
     - Body:
       ```
       [
-        1,
-        2,
-        3
+        {"id": 1, "concert_performance_id": 1, "seat_number": 1, "booked": false},
+        {"id": 2, "concert_performance_id": 1, "seat_number": 2, "booked": true}
       ]
       ```
   - 404 Not Found
@@ -227,26 +299,20 @@ Table concert_date_seat_queues as CDSQ {
     - explanation
       - `concert_date_id`에 해당하는 콘서트 날짜가 존재하지 않음
 
-### 좌석 예약 요청: POST /concert_date_seat_queues
+#### 좌석 예약 요청: POST /performance_seats/{id}/book
 - Request
-  - concert_date_id: Long
-  - seat_number: Integer
+  - id: Long
   - Content-Type: application/json
   - Header: X-Reservation-Token: {token}
-  - Body:
-    ```json
-    {
-      "concert_date_id": 1,
-      "seat_number": 1
-    }
-    ```
+  - Body: None
 - Response
   - 201 Created
     - Content-Type: application/json
     - Body:
       ```
       {
-        "result": true
+        "performance_seat_id": 1,
+        "book_attempt_at": "2024-04-01T00:00:00" // 예약 시도 시간
       }
       ```
   - 400 Bad Request
@@ -254,7 +320,7 @@ Table concert_date_seat_queues as CDSQ {
     - Body:
       ```
       {
-        "message": "Seat is already reserved"
+        "message": "Seat is already booked"
       }
       ```
     - explanation
@@ -264,11 +330,11 @@ Table concert_date_seat_queues as CDSQ {
     - Body:
       ```
       {
-        "message": "{Concert date OR seat} not found"
+        "message": "Performance seat not found"
       }
       ```
     - explanation
-      - `concert_date_id`에 해당하는 콘서트 날짜가 존재하지 않거나, `seat_number`에 해당하는 좌석이 존재하지 않음 
+      - `id`에 해당하는 좌석이 존재하지 않음 
   - 409 Conflict
     - Content-Type: application/json
     - Body:
@@ -279,93 +345,36 @@ Table concert_date_seat_queues as CDSQ {
       ```
     - explanation
       - `token`에 해당하는 사용자가 이미 예약중인 좌석이 있음
-
-### 유저 정보 조회: GET /users/{user_id}
-- Request
-  - user_id: UUID
-  - Content-Type: application/json
-  - Header: X-Reservation-Token: {token}
-  - Body: None
-- Response
-  - 200 OK
+  - 409 Conflict
     - Content-Type: application/json
     - Body:
       ```
       {
-        "id": "UUID",
-        "balance": 100
-      }
-      ```
-  - 404 Not Found
-    - Content-Type: application/json
-    - Body:
-      ```
-      {
-        "message": "User not found"
+         "message": "Other user is booking the seat"
       }
       ```
     - explanation
-      - `user_id`에 해당하는 사용자가 존재하지 않음
+      - 해당 `id`에 해당하는 좌석을 예약중인 사용자가 있음 
 
-### 유저 잔액 충전: POST /users/{user_id}/charge
-- Request
-  - user_id: UUID
-  - amount: Integer
-  - Content-Type: application/json
-  - Header: X-Reservation-Token: {token}
-  - Body:
-    ```json
-    {
-      "amount": 100
-    }
-    ```
-- Response
-  - 200 OK
-    - Content-Type: application/json
-    - Body:
-      ```
-      {
-        "result": true
-      }
-      ```
-  - 404 Not Found
-    - Content-Type: application/json
-    - Body:
-      ```
-      {
-        "message": "User not found"
-      }
-      ```
-    - explanation
-      - `user_id`에 해당하는 사용자가 존재하지 않음
-
-### 콘스터 예약 결제 요청: POST /concert_date_seat_queues/{id}/confirm
+#### 콘서트 예약 결제 요청: POST /performance_seats/{id}/pay
 - Request
   - id: Long
   - Content-Type: application/json
   - Header: X-Reservation-Token: {token}
   - Body: None
-  - Note
-    - `id`는 `concert_date_seat_queues` 테이블의 `id` 필드
 - Response
   - 200 OK
     - Content-Type: application/json
     - Body:
       ```
       {
-        "result": true
+        "id": 1,
+        "concert_performance_id": 1,
+        "seat_number": 1,
+        "user_id": "UUID",
+        "booked": true
       }
       ```
-  - 400 Bad Request
-    - Content-Type: application/json
-    - Body:
-      ```
-      {
-        "message": "Insufficient balance"
-      }
-      ```
-    - explanation
-      - 사용자의 잔액이 부족하여 결제가 불가능함
   - 400 Bad Request
     - Content-Type: application/json
     - Body:
@@ -375,14 +384,27 @@ Table concert_date_seat_queues as CDSQ {
       }
       ```
     - explanation
-      - `id`에 해당하는 예약 대기열이 시간을 초과하여 예약이 불가능함
+      - N분의 예약시간을 초과하여 예약이 불가능함
+  - 403 Bad Request
+    - Content-Type: application/json
+    - Body:
+      ```
+      {
+        "message": "Insufficient balance"
+      }
+      ```
+    - explanation
+      - 사용자의 잔액이 부족하여 결제가 불가능함
   - 404 Not Found
     - Content-Type: application/json
     - Body:
       ```
       {
-        "message": "Queue not found"
+        "message": "Performance seat not found"
       }
       ```
     - explanation
-      - `id`에 해당하는 예약 대기열이 존재하지 않음
+      - `id`에 해당하는 좌석이 존재하지 않음
+
+
+
