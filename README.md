@@ -124,7 +124,8 @@ Table performance_seat_book_logs as PSBL {
     - Body:
       ```
       {
-        "result": true
+        "id": "UUID",
+        "balance": 100.0
       }
       ```
   - 404 Not Found
