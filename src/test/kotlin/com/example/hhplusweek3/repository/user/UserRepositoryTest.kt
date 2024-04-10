@@ -21,7 +21,7 @@ class UserRepositoryTest {
         val userEntity = UserEntity(balance = userCreateObject.balance)
         every { userEntityFactory.fromCreateObject(userCreateObject) } returns userEntity
         val savedUserEntity = userEntity.copy(id = UUID.randomUUID())
-        every { userJpaRepository.save(any()) } returns savedUserEntity
+        every { userJpaRepository.save(userEntity) } returns savedUserEntity
 
         // When
         val result = userRepository.save(userCreateObject)
