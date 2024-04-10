@@ -1,5 +1,6 @@
 package com.example.hhplusweek3.domain
 
+import com.example.hhplusweek3.domain.user.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*

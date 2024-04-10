@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.entity.userQueueToken
 
-import com.example.hhplusweek3.domain.User
+import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.entity.user.UserEntity
 import io.mockk.every
 import io.mockk.mockk

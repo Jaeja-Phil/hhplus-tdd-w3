@@ -1,6 +1,7 @@
 package com.example.hhplusweek3.entity.user
 
-import com.example.hhplusweek3.domain.User
+import com.example.hhplusweek3.domain.user.User
+import com.example.hhplusweek3.domain.user.UserCreateObject
 import jakarta.persistence.*
 import java.util.*
 
@@ -17,5 +18,13 @@ class UserEntity(
             id = requireNotNull(id),
             balance = balance,
         )
+    }
+
+    companion object {
+        fun fromCreateObject(userCreateObject: UserCreateObject): UserEntity {
+            return UserEntity(
+                balance = userCreateObject.balance,
+            )
+        }
     }
 }

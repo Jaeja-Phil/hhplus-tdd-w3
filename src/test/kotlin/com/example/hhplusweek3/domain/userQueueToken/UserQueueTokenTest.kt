@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.domain.userQueueToken
 
-import com.example.hhplusweek3.domain.User
+import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
