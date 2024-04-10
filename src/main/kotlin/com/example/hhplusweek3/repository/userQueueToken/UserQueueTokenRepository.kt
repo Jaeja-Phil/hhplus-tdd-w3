@@ -14,4 +14,8 @@ class UserQueueTokenRepository(
             UserQueueTokenEntity.fromCreateObject(userQueueTokenCreateObject)
         ).toDomain()
     }
+
+    fun findByToken(token: String): UserQueueToken? {
+        return userQueueTokenJpaRepository.findByToken(token)?.toDomain()
+    }
 }

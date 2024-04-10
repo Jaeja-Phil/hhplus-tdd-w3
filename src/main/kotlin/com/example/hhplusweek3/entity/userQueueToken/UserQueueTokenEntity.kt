@@ -1,6 +1,7 @@
 package com.example.hhplusweek3.entity.userQueueToken
 
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenCreateObject
 import com.example.hhplusweek3.entity.user.UserEntity
 import jakarta.persistence.*
 
@@ -15,7 +16,7 @@ enum class UserQueueTokenStatus {
 data class UserQueueTokenEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    val id: Long? = null,
     @ManyToOne
     val user: UserEntity,
     val token: String,
@@ -28,5 +29,15 @@ data class UserQueueTokenEntity(
             token = token,
             status = status,
         )
+    }
+
+    companion object  {
+        fun fromCreateObject(userQueueTokenCreateObject: UserQueueTokenCreateObject): UserQueueTokenEntity {
+            return UserQueueTokenEntity(
+                id = null,
+                user = userQueueTokenCreateObject.user,
+                token = userQueueTokenCreateObject.token,
+            )
+        }
     }
 }
