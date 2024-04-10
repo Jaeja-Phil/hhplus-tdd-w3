@@ -14,7 +14,7 @@ class UserRepository(
         return userJpaRepository.save(UserEntity.fromCreateObject(userCreateObject)).toDomain()
     }
 
-    fun findById(id: UUID): UserEntity? {
-        return userJpaRepository.findById(id).orElse(null)
+    fun findById(id: UUID): User? {
+        return userJpaRepository.findById(id).orElse(null)?.toDomain()
     }
 }

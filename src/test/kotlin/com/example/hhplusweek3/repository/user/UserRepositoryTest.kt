@@ -32,7 +32,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `findById - should return UserEntity if found`() {
+    fun `findById - should return User if found`() {
         // Given
         val id = UUID.randomUUID()
         val userEntity = UserEntity(id = id, balance = 100.0)
@@ -42,7 +42,8 @@ class UserRepositoryTest {
         val result = userRepository.findById(id)
 
         // Then
-        assertEquals(userEntity, result)
+        assertEquals(userEntity.id, result?.id)
+        assertEquals(userEntity.balance, result?.balance)
     }
 
     @Test
