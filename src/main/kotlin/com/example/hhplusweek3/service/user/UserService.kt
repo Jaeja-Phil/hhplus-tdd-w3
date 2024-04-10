@@ -2,6 +2,7 @@ package com.example.hhplusweek3.service.user
 
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.user.UserCreateObject
+import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.repository.user.UserRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -11,9 +12,11 @@ class UserService(
     private val userRepository: UserRepository
 ) {
     fun createUser(balance: Double = 0.0): User {
-        return userRepository.save(
-            UserCreateObject(balance = balance)
-        )
+        if (balance < 0) {
+            throw BadRequestException("Balance should not be negative.")
+        }
+
+        return userRepository.save(UserCreateObject(balance = balance))
     }
 
     fun getUserById(id: UUID): User? {

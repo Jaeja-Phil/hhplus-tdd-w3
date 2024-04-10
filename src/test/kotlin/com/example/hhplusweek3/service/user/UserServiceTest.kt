@@ -2,6 +2,7 @@ package com.example.hhplusweek3.service.user
 
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.user.UserCreateObject
+import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.repository.user.UserRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -9,12 +10,24 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class UserServiceTest {
     private val userRepository = mockk<UserRepository>()
     private val userService = UserService(userRepository)
 
+    @Test
+    fun `createUser - should raise error when balance is negative`() {
+        // Given
+        val balance = -100.0
+
+        // When & Then
+        val error = assertThrows<BadRequestException> {
+            userService.createUser(balance)
+        }
+        assertEquals("Balance should not be negative.", error.message)
+    }
     @Test
     fun `createUser - should create User with passed values`() {
         // Given
