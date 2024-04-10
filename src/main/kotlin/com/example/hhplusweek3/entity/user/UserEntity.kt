@@ -5,10 +5,6 @@ import com.example.hhplusweek3.domain.user.UserCreateObject
 import jakarta.persistence.*
 import java.util.*
 
-interface UserEntityFactory {
-    fun fromCreateObject(userCreateObject: UserCreateObject): UserEntity
-}
-
 @Entity
 @Table(name = "users")
 data class UserEntity(
@@ -24,8 +20,8 @@ data class UserEntity(
         )
     }
 
-    companion object : UserEntityFactory {
-        override fun fromCreateObject(userCreateObject: UserCreateObject): UserEntity {
+    companion object {
+        fun fromCreateObject(userCreateObject: UserCreateObject): UserEntity {
             return UserEntity(
                 balance = userCreateObject.balance,
             )
