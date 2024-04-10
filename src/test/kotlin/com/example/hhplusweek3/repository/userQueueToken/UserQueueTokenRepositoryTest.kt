@@ -77,4 +77,27 @@ class UserQueueTokenRepositoryTest {
         assertEquals(userQueueTokenEntity.token, result?.token)
         assertEquals(userQueueTokenEntity.status, result?.status)
     }
+
+    @Test
+    fun `findByUserId - should return list of UserQueueToken if found`() {
+        // Given
+        val userId = UUID.randomUUID()
+        val userEntity = UserEntity(id = userId, balance = 100.0)
+        val userQueueTokenEntity = UserQueueTokenEntity(
+            id = 1L,
+            user = userEntity,
+            token = "token"
+        )
+        every { userQueueTokenJpaRepository.findByUserId(userId) } returns listOf(userQueueTokenEntity)
+
+        // When
+        val result = userQueueTokenRepository.findByUserId(userId)
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals(userQueueTokenEntity.id, result[0].id)
+        assertEquals(userQueueTokenEntity.user.toDomain(), result[0].user)
+        assertEquals(userQueueTokenEntity.token, result[0].token)
+        assertEquals(userQueueTokenEntity.status, result[0].status)
+    }
 }

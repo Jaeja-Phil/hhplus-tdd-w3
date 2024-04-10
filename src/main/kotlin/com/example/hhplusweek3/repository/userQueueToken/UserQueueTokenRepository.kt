@@ -4,6 +4,7 @@ import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenCreateObject
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenEntity
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class UserQueueTokenRepository(
@@ -17,5 +18,12 @@ class UserQueueTokenRepository(
 
     fun findByToken(token: String): UserQueueToken? {
         return userQueueTokenJpaRepository.findByToken(token)?.toDomain()
+    }
+
+    /**
+     * use userId instead of user entity object because requiring user object will force the user to load the user object
+     */
+    fun findByUserId(userId: UUID): List<UserQueueToken> {
+        return userQueueTokenJpaRepository.findByUserId(userId).map { it.toDomain() }
     }
 }
