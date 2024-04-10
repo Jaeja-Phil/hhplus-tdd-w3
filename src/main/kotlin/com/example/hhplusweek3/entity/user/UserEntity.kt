@@ -9,7 +9,7 @@ import java.util.*
 @Table(name = "users")
 data class UserEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     val id: UUID? = null,
     val balance: Double = 0.0
 ) {
