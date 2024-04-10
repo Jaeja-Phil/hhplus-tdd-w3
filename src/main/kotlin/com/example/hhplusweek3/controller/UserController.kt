@@ -1,14 +1,24 @@
 package com.example.hhplusweek3.controller
 
+import com.example.hhplusweek3.application.user.UserCreateApplication
 import com.example.hhplusweek3.controller.request.UserChargeBalanceRequest
+import com.example.hhplusweek3.controller.request.UserCreateRequest
+import com.example.hhplusweek3.controller.response.UserResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/users")
-class UserController {
+class UserController(
+    private val userCreateApplication: UserCreateApplication
+) {
+    @PostMapping
+    fun createUser(@RequestBody request: UserCreateRequest): ResponseEntity<UserResponse> {
+        return ResponseEntity(userCreateApplication.run(request), HttpStatus.CREATED)
+    }
+
     @PostMapping("/{id}/charge")
     fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID) =
         ResponseEntity(HashMap<String, Any>().apply {
