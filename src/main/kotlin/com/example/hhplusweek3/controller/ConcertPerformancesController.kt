@@ -4,8 +4,8 @@ import com.example.hhplusweek3.application.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -14,7 +14,7 @@ class ConcertPerformancesController(
     private val concertPerformanceGetAllAvailableApplication: ConcertPerformanceGetAllAvailableApplication
 ) {
     @GetMapping
-    fun getConcertPerformances(@PathVariable concertId: Long): ResponseEntity<List<ConcertPerformanceResponse>> {
+    fun getConcertPerformances(@RequestParam concertId: Long): ResponseEntity<List<ConcertPerformanceResponse>> {
         return ResponseEntity
             .ok()
             .body(concertPerformanceGetAllAvailableApplication.run(concertId))
