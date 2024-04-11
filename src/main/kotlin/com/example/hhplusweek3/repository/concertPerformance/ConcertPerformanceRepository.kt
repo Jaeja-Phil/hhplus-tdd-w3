@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.repository.concertPerformance
 
-import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
+import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -11,10 +11,10 @@ class ConcertPerformanceRepository(
     fun getAvailableConcertPerformances(
         concertId: Long,
         performanceDateTime: LocalDateTime = LocalDateTime.now()
-    ): List<ConcertPerformanceEntity> {
+    ): List<ConcertPerformance> {
         return concertPerformanceJpaRepository.findAllAvailableByConcertIdAndPerformanceDateTimeAfter(
             concertId = concertId,
             performanceDateTime = performanceDateTime
-        )
+        ).map { it.toDomain() }
     }
 }
