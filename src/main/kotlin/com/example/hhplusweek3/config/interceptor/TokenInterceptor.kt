@@ -40,6 +40,11 @@ class TokenInterceptor(
     }
 
     private fun isTokenRequired(request: HttpServletRequest): Boolean {
+        // allow all swaggers
+        if (request.requestURI.contains("swagger") || request.requestURI.contains("api-docs")) {
+            return false
+        }
+
         val nonTokenRequiredList = listOf(
             "/user-queue-tokens" to RequestMethod.POST.name,
             "/users/*/charge" to RequestMethod.POST.name,

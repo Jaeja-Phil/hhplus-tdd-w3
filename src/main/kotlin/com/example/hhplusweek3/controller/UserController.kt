@@ -2,6 +2,7 @@ package com.example.hhplusweek3.controller
 
 import com.example.hhplusweek3.application.user.UserAdjustBalanceApplication
 import com.example.hhplusweek3.application.user.UserCreateApplication
+import com.example.hhplusweek3.controller.apiSpec.UserControllerApiSpec
 import com.example.hhplusweek3.controller.request.UserChargeBalanceRequest
 import com.example.hhplusweek3.controller.request.UserCreateRequest
 import com.example.hhplusweek3.controller.response.UserResponse
@@ -15,14 +16,14 @@ import java.util.*
 class UserController(
     private val userCreateApplication: UserCreateApplication,
     private val userAdjustBalanceApplication: UserAdjustBalanceApplication
-) {
+) : UserControllerApiSpec {
     @PostMapping
-    fun createUser(@RequestBody request: UserCreateRequest): ResponseEntity<UserResponse> {
+    override fun createUser(@RequestBody request: UserCreateRequest): ResponseEntity<UserResponse> {
         return ResponseEntity(userCreateApplication.run(request), HttpStatus.CREATED)
     }
 
     @PostMapping("/{id}/charge")
-    fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID): ResponseEntity<UserResponse> {
+    override fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID): ResponseEntity<UserResponse> {
         return ResponseEntity(userAdjustBalanceApplication.run(id, request.amount), HttpStatus.OK)
     }
 
