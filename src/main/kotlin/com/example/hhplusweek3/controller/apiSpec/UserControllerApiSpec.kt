@@ -58,7 +58,7 @@ interface UserControllerApiSpec {
                     mediaType = "application/json",
                     schema = Schema(implementation = UserChargeBalanceRequest::class)
                 )
-            ]
+            ],
         ),
         responses = [
             ApiResponse(
