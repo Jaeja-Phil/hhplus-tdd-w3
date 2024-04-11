@@ -1,5 +1,6 @@
 package com.example.hhplusweek3.controller
 
+import com.example.hhplusweek3.application.user.UserAdjustBalanceApplication
 import com.example.hhplusweek3.application.user.UserCreateApplication
 import com.example.hhplusweek3.controller.request.UserChargeBalanceRequest
 import com.example.hhplusweek3.controller.request.UserCreateRequest
@@ -12,7 +13,8 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 class UserController(
-    private val userCreateApplication: UserCreateApplication
+    private val userCreateApplication: UserCreateApplication,
+    private val userAdjustBalanceApplication: UserAdjustBalanceApplication
 ) {
     @PostMapping
     fun createUser(@RequestBody request: UserCreateRequest): ResponseEntity<UserResponse> {
@@ -20,11 +22,10 @@ class UserController(
     }
 
     @PostMapping("/{id}/charge")
-    fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID) =
-        ResponseEntity(HashMap<String, Any>().apply {
-            put("id", id)
-            put("balance", request.amount)
-        }, HttpStatus.OK)
+    fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID): ResponseEntity<UserResponse> {
+        return ResponseEntity(userAdjustBalanceApplication.run(id, request.amount), HttpStatus.OK)
+    }
+
 
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: UUID) =

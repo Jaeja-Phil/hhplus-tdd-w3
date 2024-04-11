@@ -1,6 +1,7 @@
 package com.example.hhplusweek3.config.advice
 
 import com.example.hhplusweek3.error.BadRequestException
+import com.example.hhplusweek3.error.NotEnoughBalanceException
 import com.example.hhplusweek3.error.NotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -32,6 +33,14 @@ class ControllerAdvice {
         return ResponseEntity(
             ErrorResponse(e.message ?: "Not Found"),
             HttpStatus.NOT_FOUND
+        )
+    }
+
+    @ExceptionHandler(NotEnoughBalanceException::class)
+    fun handleNotEnoughBalanceException(e: NotEnoughBalanceException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(
+            ErrorResponse(e.message ?: "Not Enough Balance"),
+            HttpStatus.BAD_REQUEST
         )
     }
 }
