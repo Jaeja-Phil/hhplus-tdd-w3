@@ -17,6 +17,10 @@ class UserQueueTokenService(
         return createUserQueueToken(user)
     }
 
+    fun getByToken(token: String): UserQueueToken? {
+        return userQueueTokenRepository.findByToken(token)
+    }
+
     /**
      * TODO:
      *   must implement some sort of locking mechanism to ensure that other distributed services do not create token
