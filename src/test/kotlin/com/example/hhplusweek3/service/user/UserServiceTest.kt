@@ -67,4 +67,36 @@ class UserServiceTest {
         // Then
         assertNull(result)
     }
+
+    @Test
+    fun `adjustUserBalance - should raise error when adjustBalance fails`() {
+        // Given
+        val amount = -200.0
+        val user = mockk<User>() {
+            every { adjustBalance(amount) } throws BadRequestException("Not enough balance.")
+        }
+
+        // When & Then
+        val error = assertThrows<BadRequestException> {
+            userService.adjustUserBalance(user, amount)
+        }
+        assertEquals("Not enough balance.", error.message)
+    }
+
+    @Test
+    fun `adjustUserBalance - should update balance of User`() {
+        // Given
+        val amount = 50.0
+        val user = mockk<User>() {
+            every { adjustBalance(amount) } returns mockk()
+        }
+        every { userRepository.update(any()) } returns mockk()
+
+        // When
+        userService.adjustUserBalance(user, amount)
+
+        // Then
+        verify(exactly = 1) { user.adjustBalance(amount) }
+        verify(exactly = 1) { userRepository.update(any()) }
+    }
 }
