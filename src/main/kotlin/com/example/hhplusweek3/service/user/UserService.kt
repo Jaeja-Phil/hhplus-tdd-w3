@@ -22,4 +22,9 @@ class UserService(
     fun getUserById(id: UUID): User? {
         return userRepository.findById(id)
     }
+
+    fun adjustUserBalance(user: User, amount: Double): User {
+        val updatedUser = user.adjustBalance(amount)
+        return userRepository.update(updatedUser)
+    }
 }
