@@ -10,8 +10,11 @@ class PerformanceSeatService(
 ) {
     fun getAllAvailableSeatNumbersByConcertPerformance(concertPerformance: ConcertPerformance): List<Int> {
         val bookedSeatNumbers = performanceSeatRepository
-            .findAllByConcertPerformanceIdAndBooked(concertPerformanceId = concertPerformance.id, booked = true)
-            .filter { it.booked }
+            .findAllByConcertPerformanceIdAndBookedAndUserId(
+                concertPerformanceId = concertPerformance.id,
+                booked = true,
+                userId = null
+            )
             .map { it.seatNumber }
         val allSeatNumbers = (1..concertPerformance.maxSeats).toList()
 

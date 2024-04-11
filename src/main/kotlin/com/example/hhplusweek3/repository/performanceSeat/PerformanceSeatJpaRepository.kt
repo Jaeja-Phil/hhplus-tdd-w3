@@ -2,7 +2,12 @@ package com.example.hhplusweek3.repository.performanceSeat
 
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import java.util.*
 
 interface PerformanceSeatJpaRepository : JpaRepository<PerformanceSeatEntity, Long> {
-    fun findAllByConcertPerformanceIdAndBooked(concertPerformanceId: Long, booked: Boolean): List<PerformanceSeatEntity>
+    fun findAllByConcertPerformanceIdAndBookedAndUserId(
+        concertPerformanceId: Long,
+        booked: Boolean,
+        userId: UUID?
+    ): List<PerformanceSeatEntity>
 }

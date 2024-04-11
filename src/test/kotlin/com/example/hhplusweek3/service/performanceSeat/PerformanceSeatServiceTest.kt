@@ -25,7 +25,10 @@ class PerformanceSeatServiceTest {
             performanceDateTime = LocalDateTime.now()
         )
         every {
-            performanceSeatRepository.findAllByConcertPerformanceIdAndBooked(1L, true)
+            performanceSeatRepository.findAllByConcertPerformanceIdAndBookedAndUserId(
+                concertPerformanceId = 1L,
+                booked = true,
+                userId = null)
         } returns listOf(
             PerformanceSeat(
                 id = 1L,

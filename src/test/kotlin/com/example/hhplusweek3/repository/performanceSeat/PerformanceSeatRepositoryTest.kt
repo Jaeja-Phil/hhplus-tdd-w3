@@ -11,7 +11,7 @@ class PerformanceSeatRepositoryTest {
     private val performanceSeatRepository = PerformanceSeatRepository(performanceSeatJpaRepository)
 
     @Test
-    fun `findAllByConcertPerformanceIdAndBooked - should return all performance seats by concert performance id and booked`() {
+    fun `findAllByConcertPerformanceIdAndBookedAndUserId - should return all performance seats by concertPerformanceId, booked and userId`() {
         // given
         val concertPerformanceId = 1L
         val booked = false
@@ -25,11 +25,20 @@ class PerformanceSeatRepositoryTest {
             user = null
         )
         every {
-            performanceSeatJpaRepository.findAllByConcertPerformanceIdAndBooked(concertPerformanceId, booked)
+            performanceSeatJpaRepository.findAllByConcertPerformanceIdAndBookedAndUserId(
+                concertPerformanceId = concertPerformanceId,
+                booked = false,
+                userId = null
+            )
         } returns listOf(performanceSeatEntity)
 
         // when
-        val SUT = performanceSeatRepository.findAllByConcertPerformanceIdAndBooked(concertPerformanceId, booked)
+        val SUT = performanceSeatRepository
+            .findAllByConcertPerformanceIdAndBookedAndUserId(
+                concertPerformanceId = concertPerformanceId,
+                booked = booked,
+                userId = null
+            )
 
         // then
         assertEquals(1, SUT.size)
