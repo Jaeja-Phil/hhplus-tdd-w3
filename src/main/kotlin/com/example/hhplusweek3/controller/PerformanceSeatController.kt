@@ -1,28 +1,19 @@
 package com.example.hhplusweek3.controller
 
+import com.example.hhplusweek3.application.performanceSeat.PerformanceSeatGetAllAvailableApplication
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/performance-seats")
-class PerformanceSeatController {
+class PerformanceSeatController(
+    private val performanceSeatGetAllAvailableApplication: PerformanceSeatGetAllAvailableApplication
+) {
     @GetMapping
-    fun getPerformanceSeats(@RequestParam concertDateId: String) = ResponseEntity(
-        listOf(
-            HashMap<String, Any>().apply {
-                put("id", 1)
-                put("concert_date_id", concertDateId)
-                put("seat_number", 1)
-                put("booked", false)
-            }),
-        HttpStatus.OK
-    )
+    fun getAvailablePerformanceSeatsNumbers(@RequestParam concertPerformanceId: Long): ResponseEntity<List<Int>> {
+        return ResponseEntity(performanceSeatGetAllAvailableApplication.run(concertPerformanceId), HttpStatus.OK)
+    }
 
     @PostMapping("/{id}/book")
     fun bookPerformanceSeat(@PathVariable id: Long, @RequestParam concertDateId: String) =

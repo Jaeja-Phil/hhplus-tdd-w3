@@ -7,6 +7,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.*
 
 class ConcertPerformanceRepositoryTest {
     private val concertPerformanceJpaRepository = mockk<ConcertPerformanceJpaRepository>()
@@ -36,5 +37,37 @@ class ConcertPerformanceRepositoryTest {
 
         // Then
         assertEquals(concertPerformances.map { it.toDomain() }, result)
+    }
+
+    @Test
+    fun `findById - should return null when concert performance not found`() {
+        // Given
+        every { concertPerformanceJpaRepository.findById(1) } returns Optional.empty()
+
+        // When
+        val result = concertPerformanceRepository.findById(1)
+
+        // Then
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun `findById - should return concert performance when concert performance found`() {
+        // Given
+        val concertPerformance = ConcertPerformanceEntity(
+            id = 1,
+            concert = mockk() {
+                every { toDomain() } returns mockk()
+            },
+            maxSeats = 100,
+            performanceDateTime = now
+        )
+        every { concertPerformanceJpaRepository.findById(1) } returns Optional.of(concertPerformance)
+
+        // When
+        val result = concertPerformanceRepository.findById(1)
+
+        // Then
+        assertEquals(concertPerformance.toDomain(), result)
     }
 }

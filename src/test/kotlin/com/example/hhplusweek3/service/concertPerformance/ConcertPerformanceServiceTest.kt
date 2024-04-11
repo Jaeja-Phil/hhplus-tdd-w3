@@ -37,4 +37,34 @@ class ConcertPerformanceServiceTest {
         // Then
         assertEquals(concertPerformances, SUT)
     }
+
+    @Test
+    fun `getConcertById - should return null when concert not found`() {
+        // Given
+        every { concertPerformanceRepository.findById(1L) } returns null
+
+        // When
+        val result = concertPerformanceService.getConcertById(1L)
+
+        // Then
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun `getConcertById - should return concert when concert found`() {
+        // Given
+        val concertPerformance = ConcertPerformance(
+            id = 1L,
+            concert = mockk(),
+            maxSeats = 100,
+            performanceDateTime = now
+        )
+        every { concertPerformanceRepository.findById(1L) } returns concertPerformance
+
+        // When
+        val result = concertPerformanceService.getConcertById(1L)
+
+        // Then
+        assertEquals(concertPerformance, result)
+    }
 }

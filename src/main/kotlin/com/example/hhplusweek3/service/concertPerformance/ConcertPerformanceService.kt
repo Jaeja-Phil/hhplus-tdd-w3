@@ -11,4 +11,8 @@ class ConcertPerformanceService(
     fun getAvailableConcertPerformances(concertId: Long): List<ConcertPerformance> {
         return concertPerformanceRepository.getAvailableConcertPerformances(concertId)
     }
+
+    fun getConcertById(id: Long): ConcertPerformance? {
+        return concertPerformanceRepository.findById(id)
+    }
 }

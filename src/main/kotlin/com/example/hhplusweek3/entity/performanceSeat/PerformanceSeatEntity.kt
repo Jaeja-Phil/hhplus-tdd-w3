@@ -6,7 +6,10 @@ import com.example.hhplusweek3.entity.user.UserEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "performance_seats")
+@Table(
+    name = "performance_seats",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["concert_performance_id", "seatNumber"])]
+)
 data class PerformanceSeatEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

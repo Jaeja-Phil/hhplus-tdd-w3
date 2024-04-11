@@ -17,4 +17,8 @@ class ConcertPerformanceRepository(
             performanceDateTime = performanceDateTime
         ).map { it.toDomain() }
     }
+
+    fun findById(id: Long): ConcertPerformance? {
+        return concertPerformanceJpaRepository.findById(id).orElse(null)?.toDomain()
+    }
 }
