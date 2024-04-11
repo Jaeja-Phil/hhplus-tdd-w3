@@ -100,4 +100,41 @@ class UserQueueTokenRepositoryTest {
         assertEquals(userQueueTokenEntity.token, result[0].token)
         assertEquals(userQueueTokenEntity.status, result[0].status)
     }
+
+    @Test
+    fun `findByUserIdAndStatusNot - should return list of UserQueueToken if found`() {
+        // Given
+        val userId = UUID.randomUUID()
+        val userEntity = UserEntity(id = userId, balance = 100.0)
+        val userQueueTokenEntity = UserQueueTokenEntity(
+            id = 1L,
+            user = userEntity,
+            token = "token",
+            status = UserQueueTokenStatus.IN_QUEUE
+        )
+        every { userQueueTokenJpaRepository.findByUserIdAndStatusNot(userId, UserQueueTokenStatus.EXPIRED) } returns listOf(userQueueTokenEntity)
+
+        // When
+        val result = userQueueTokenRepository.findByUserIdAndStatusNot(userId, UserQueueTokenStatus.EXPIRED)
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals(userQueueTokenEntity.id, result[0].id)
+        assertEquals(userQueueTokenEntity.user.toDomain(), result[0].user)
+        assertEquals(userQueueTokenEntity.token, result[0].token)
+        assertEquals(userQueueTokenEntity.status, result[0].status)
+    }
+
+    @Test
+    fun `findByUserIdAndStatusNot - should return empty list if not found`() {
+        // Given
+        val userId = UUID.randomUUID()
+        every { userQueueTokenJpaRepository.findByUserIdAndStatusNot(userId, UserQueueTokenStatus.EXPIRED) } returns emptyList()
+
+        // When
+        val result = userQueueTokenRepository.findByUserIdAndStatusNot(userId, UserQueueTokenStatus.EXPIRED)
+
+        // Then
+        assertEquals(0, result.size)
+    }
 }

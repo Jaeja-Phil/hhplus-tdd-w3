@@ -3,6 +3,7 @@ package com.example.hhplusweek3.repository.userQueueToken
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenCreateObject
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenEntity
+import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import org.springframework.stereotype.Repository
 import java.util.*
 
@@ -25,5 +26,9 @@ class UserQueueTokenRepository(
      */
     fun findByUserId(userId: UUID): List<UserQueueToken> {
         return userQueueTokenJpaRepository.findByUserId(userId).map { it.toDomain() }
+    }
+
+    fun findByUserIdAndStatusNot(userId: UUID, status: UserQueueTokenStatus): List<UserQueueToken> {
+        return userQueueTokenJpaRepository.findByUserIdAndStatusNot(userId, status).map { it.toDomain() }
     }
 }
