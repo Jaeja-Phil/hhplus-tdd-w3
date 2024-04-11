@@ -24,4 +24,17 @@ class ConcertServiceTest {
          assertEquals(1, result.size)
          assertEquals(Concert(1, "Concert 1"), result.first())
     }
+
+    @Test
+    fun `createConcert - should return Concert`() {
+        // given
+         val concert = Concert(1, "Concert 1")
+         every { concertRepository.save(any()) } returns concert
+
+        // when
+         val result = concertService.createConcert("Concert 1")
+
+        // then
+         assertEquals(Concert(1, "Concert 1"), result)
+    }
 }

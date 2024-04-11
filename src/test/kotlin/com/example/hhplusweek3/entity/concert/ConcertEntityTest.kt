@@ -1,6 +1,7 @@
 package com.example.hhplusweek3.entity.concert
 
 import com.example.hhplusweek3.domain.concert.Concert
+import com.example.hhplusweek3.domain.concert.ConcertCreateObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -27,5 +28,17 @@ class ConcertEntityTest {
 
         // Then
         assertEquals(Concert(1L, "concert"), result)
+    }
+
+    @Test
+    fun `fromCreateObject - should return ConcertEntity`() {
+        // Given
+        val concertCreateObject = ConcertCreateObject("concert")
+
+        // When
+        val result = ConcertEntity.fromCreateObject(concertCreateObject)
+
+        // Then
+        assertEquals(ConcertEntity(null, "concert"), result)
     }
 }
