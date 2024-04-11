@@ -17,12 +17,10 @@ class UserController(
     private val userCreateApplication: UserCreateApplication,
     private val userAdjustBalanceApplication: UserAdjustBalanceApplication
 ) : UserControllerApiSpec {
-    @PostMapping
     override fun createUser(@RequestBody request: UserCreateRequest): ResponseEntity<UserResponse> {
         return ResponseEntity(userCreateApplication.run(request), HttpStatus.CREATED)
     }
 
-    @PostMapping("/{id}/charge")
     override fun charge(@RequestBody request: UserChargeBalanceRequest, @PathVariable id: UUID): ResponseEntity<UserResponse> {
         return ResponseEntity(userAdjustBalanceApplication.run(id, request.amount), HttpStatus.OK)
     }
