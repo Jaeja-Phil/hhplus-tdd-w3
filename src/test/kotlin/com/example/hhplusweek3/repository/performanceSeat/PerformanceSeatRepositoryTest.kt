@@ -1,5 +1,6 @@
 package com.example.hhplusweek3.repository.performanceSeat
 
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import io.mockk.every
 import io.mockk.mockk
@@ -22,7 +23,8 @@ class PerformanceSeatRepositoryTest {
             },
             booked = booked,
             seatNumber = 1,
-            user = null
+            user = null,
+            performanceSeatBookInfo = null
         )
         every {
             performanceSeatJpaRepository.findAllByConcertPerformanceIdAndBookedAndUserId(
@@ -43,5 +45,88 @@ class PerformanceSeatRepositoryTest {
         // then
         assertEquals(1, SUT.size)
         assertEquals(performanceSeatEntity.toDomain(), SUT[0])
+    }
+
+    @Test
+    fun `findBySeatNumberAndConcertPerformanceId - should return performance seat by seatNumber and concertPerformanceId`() {
+        // given
+        val seatNumber = 1
+        val concertPerformanceId = 1L
+        val performanceSeatEntity = PerformanceSeatEntity(
+            id = 1L,
+            concertPerformance = mockk() {
+                every { toDomain() } returns mockk()
+            },
+            booked = false,
+            seatNumber = seatNumber,
+            user = null,
+            performanceSeatBookInfo = null
+        )
+        every {
+            performanceSeatJpaRepository.findBySeatNumberAndConcertPerformanceId(
+                seatNumber = seatNumber,
+                concertPerformanceId = concertPerformanceId
+            )
+        } returns performanceSeatEntity
+
+        // when
+        val SUT = performanceSeatRepository
+            .findBySeatNumberAndConcertPerformanceId(
+                seatNumber = seatNumber,
+                concertPerformanceId = concertPerformanceId
+            )
+
+        // then
+        assertEquals(performanceSeatEntity.toDomain(), SUT)
+    }
+
+    @Test
+    fun `save - should save performance seat`() {
+        // given
+        val performanceSeatCreateObject = mockk<PerformanceSeatCreateObject>() {
+            every { concertPerformance } returns mockk() {
+                every { toEntity() } returns mockk()
+            }
+            every { seatNumber } returns 1
+        }
+        val performanceSeatEntity = PerformanceSeatEntity(
+            id = 1L,
+            concertPerformance = mockk() {
+                every { toDomain() } returns mockk()
+            },
+            booked = false,
+            seatNumber = 1,
+            user = null,
+            performanceSeatBookInfo = null
+        )
+        every { performanceSeatJpaRepository.save(any()) } returns performanceSeatEntity
+
+        // when
+        val SUT = performanceSeatRepository.save(performanceSeatCreateObject)
+
+        // then
+        assertEquals(performanceSeatEntity.toDomain(), SUT)
+    }
+
+    @Test
+    fun `update - should update performance seat`() {
+        // given
+        val performanceSeatEntity = PerformanceSeatEntity(
+            id = 1L,
+            concertPerformance = mockk() {
+                every { toDomain() } returns mockk()
+            },
+            booked = false,
+            seatNumber = 1,
+            user = null,
+            performanceSeatBookInfo = null
+        )
+        every { performanceSeatJpaRepository.save(any()) } returns performanceSeatEntity
+
+        // when
+        val SUT = performanceSeatRepository.update(performanceSeatEntity)
+
+        // then
+        assertEquals(performanceSeatEntity.toDomain(), SUT)
     }
 }
