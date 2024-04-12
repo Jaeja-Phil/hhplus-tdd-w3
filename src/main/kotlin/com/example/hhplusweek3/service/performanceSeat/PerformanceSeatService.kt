@@ -1,6 +1,8 @@
 package com.example.hhplusweek3.service.performanceSeat
 
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import org.springframework.stereotype.Service
 
@@ -19,5 +21,20 @@ class PerformanceSeatService(
         val allSeatNumbers = (1..concertPerformance.maxSeats).toList()
 
         return allSeatNumbers - bookedSeatNumbers
+    }
+
+    fun getBySeatNumberAndConcertPerformanceId(seatNumber: Int, concertPerformanceId: Long): PerformanceSeat? {
+        return performanceSeatRepository.findBySeatNumberAndConcertPerformanceId(
+            seatNumber = seatNumber,
+            concertPerformanceId = concertPerformanceId
+        )
+    }
+
+    fun createPerformanceSeat(performanceSeatCreateObject: PerformanceSeatCreateObject): PerformanceSeat {
+        return performanceSeatRepository.save(performanceSeatCreateObject)
+    }
+
+    fun update(performanceSeat: PerformanceSeat): PerformanceSeat {
+        return performanceSeatRepository.update(performanceSeat.toEntity())
     }
 }
