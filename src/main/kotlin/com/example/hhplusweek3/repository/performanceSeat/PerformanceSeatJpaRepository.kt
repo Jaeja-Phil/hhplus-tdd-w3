@@ -10,4 +10,6 @@ interface PerformanceSeatJpaRepository : JpaRepository<PerformanceSeatEntity, Lo
         booked: Boolean,
         userId: UUID?
     ): List<PerformanceSeatEntity>
+
+    fun findBySeatNumberAndConcertPerformanceId(seatNumber: Int, concertPerformanceId: Long): PerformanceSeatEntity?
 }
