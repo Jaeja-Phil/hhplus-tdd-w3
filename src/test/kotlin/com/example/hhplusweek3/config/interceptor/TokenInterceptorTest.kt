@@ -74,7 +74,7 @@ class TokenInterceptorTest {
         every { tokenInterceptor["getToken"](request) } answers { "token" }
         every { tokenInterceptor["isValidToken"]("token") } answers { true }
         every { userQueueTokenService.getByToken("token") } answers { userQueueToken }
-        every { request.setAttribute("currentUser", userQueueToken.user) } answers { Unit }
+        every { request.setAttribute("currentUserQueueToken", userQueueToken) } answers { Unit }
 
         // when
         val result = tokenInterceptor.preHandle(request, response, handler)
@@ -85,7 +85,7 @@ class TokenInterceptorTest {
         verify(exactly = 1) { tokenInterceptor["getToken"](request) }
         verify(exactly = 1) { tokenInterceptor["isValidToken"]("token") }
         verify(exactly = 1) { userQueueTokenService.getByToken("token") }
-        verify(exactly = 1) { request.setAttribute("currentUser", userQueueToken.user) }
+        verify(exactly = 1) { request.setAttribute("currentUserQueueToken", userQueueToken) }
     }
 }
 
