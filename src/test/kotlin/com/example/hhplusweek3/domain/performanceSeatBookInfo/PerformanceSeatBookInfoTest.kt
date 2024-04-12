@@ -1,5 +1,6 @@
 package com.example.hhplusweek3.domain.performanceSeatBookInfo
 
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,10 +13,13 @@ class PerformanceSeatBookInfoTest {
     @Test
     fun `toEntity - should convert PerformanceSeatBookInfo to PerformanceSeatBookInfoEntity`() {
         // Given
+        val performanceSeatMock = mockk<PerformanceSeat>() {
+            every { toEntity() } returns mockk()
+            every { id } returns 1
+
+        }
         val performanceSeatBookInfo = PerformanceSeatBookInfo(
-            performanceSeat = mockk() {
-                every { toEntity() } returns mockk()
-            },
+            performanceSeat = performanceSeatMock,
             token = "token",
             bookAttemptAt = now,
             bookSuccessAt = now

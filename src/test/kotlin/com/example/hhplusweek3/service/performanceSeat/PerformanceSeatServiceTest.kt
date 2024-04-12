@@ -4,6 +4,7 @@ import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
+import com.example.hhplusweek3.domain.performanceSeatBookInfo.PerformanceSeatBookInfo
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -102,19 +103,30 @@ class PerformanceSeatServiceTest {
     @Test
     fun `update - should return updated performance seat`() {
         // given
+        val performanceSeatBookInfoMock = mockk<PerformanceSeatBookInfo>() {
+            every { toEntity() } returns mockk()
+        }
         val performanceSeat = mockk<PerformanceSeat>() {
+            every { id } returns 1
             every { toEntity() } returns mockk()
             every { seatNumber } returns 1
+            every { concertPerformance } returns mockk() {
+                every { toEntity() } returns mockk()
+            }
+            every { user } returns null
+            every { booked } returns false
+            every { performanceSeatBookInfo } returns performanceSeatBookInfoMock
         }
+
         every {
-            performanceSeatRepository.update(performanceSeat.toEntity())
+            performanceSeatRepository.update(any())
         } returns PerformanceSeat(
             id = 1L,
             concertPerformance = mockk(),
             seatNumber = 1,
             user = null,
             booked = false,
-            performanceSeatBookInfo = null
+            performanceSeatBookInfo = performanceSeatBookInfoMock
         )
 
         // when

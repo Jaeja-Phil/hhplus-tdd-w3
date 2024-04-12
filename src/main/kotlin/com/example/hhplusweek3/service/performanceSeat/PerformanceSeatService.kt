@@ -3,6 +3,7 @@ package com.example.hhplusweek3.service.performanceSeat
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
+import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import org.springframework.stereotype.Service
 
@@ -35,6 +36,10 @@ class PerformanceSeatService(
     }
 
     fun update(performanceSeat: PerformanceSeat): PerformanceSeat {
-        return performanceSeatRepository.update(performanceSeat.toEntity())
+        return performanceSeatRepository.update(PerformanceSeatEntity.fromDomain(performanceSeat))
+    }
+
+    fun getById(performanceSeatId: Long): PerformanceSeat? {
+        return performanceSeatRepository.findById(performanceSeatId)
     }
 }

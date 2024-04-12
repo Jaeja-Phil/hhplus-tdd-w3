@@ -60,4 +60,21 @@ data class PerformanceSeat(
             )
         )
     }
+
+    fun confirm(token: String): PerformanceSeat {
+        if (performanceSeatBookInfo?.token != token) {
+            throw BadRequestException("Invalid token.")
+        }
+
+        if (!performanceSeatBookInfo.isConfirmable()) {
+            throw BadRequestException("Performance seat is not confirmable.")
+        }
+
+        return copy(
+            booked = true,
+            performanceSeatBookInfo = performanceSeatBookInfo.copy(
+                bookSuccessAt = LocalDateTime.now()
+            )
+        )
+    }
 }

@@ -40,4 +40,8 @@ class PerformanceSeatRepository(
     fun update(toEntity: PerformanceSeatEntity): PerformanceSeat {
         return performanceSeatJpaRepository.save(toEntity).toDomain()
     }
+
+    fun findById(id: Long): PerformanceSeat? {
+        return performanceSeatJpaRepository.findById(id).orElse(null)?.toDomain()
+    }
 }

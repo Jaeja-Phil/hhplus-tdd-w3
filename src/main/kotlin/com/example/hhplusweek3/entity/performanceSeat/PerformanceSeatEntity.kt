@@ -33,7 +33,7 @@ data class PerformanceSeatEntity(
             seatNumber = seatNumber,
             user = user?.toDomain(),
             booked = booked,
-            performanceSeatBookInfo = if (includeBookInfo) performanceSeatBookInfo?.toDomain(!includeBookInfo) else null // to avoid infinite recursion
+            performanceSeatBookInfo = if (includeBookInfo) performanceSeatBookInfo?.toDomain() else null
         )
     }
 
@@ -46,6 +46,17 @@ data class PerformanceSeatEntity(
                 user = null,
                 booked = false,
                 performanceSeatBookInfo = null
+            )
+        }
+
+        fun fromDomain(performanceSeat: PerformanceSeat): PerformanceSeatEntity {
+            return PerformanceSeatEntity(
+                id = performanceSeat.id,
+                concertPerformance = performanceSeat.concertPerformance.toEntity(),
+                seatNumber = performanceSeat.seatNumber,
+                user = performanceSeat.user?.toEntity(),
+                booked = performanceSeat.booked,
+                performanceSeatBookInfo = performanceSeat.performanceSeatBookInfo?.toEntity()
             )
         }
     }

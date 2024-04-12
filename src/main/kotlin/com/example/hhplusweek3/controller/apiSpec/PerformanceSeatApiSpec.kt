@@ -3,6 +3,7 @@ package com.example.hhplusweek3.controller.apiSpec
 import com.example.hhplusweek3.controller.request.PerformanceSeatBookRequest
 import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -62,4 +63,32 @@ interface PerformanceSeatApiSpec {
         ]
     )
     fun bookPerformanceSeat(request: PerformanceSeatBookRequest): ResponseEntity<PerformanceSeatResponse>
+
+    @PostMapping("/{id}/pay")
+    @Operation(
+        summary = "공연 좌석 결제",
+        description = "공연 좌석을 결제합니다.",
+        parameters = [
+            Parameter(
+                name = "id",
+                description = "공연 좌석 ID",
+                required = true,
+                example = "1",
+                schema = Schema(type = "integer")
+            )
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "공연 좌석 결제 성공",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = PerformanceSeatResponse::class),
+                    )
+                ]
+            )
+        ]
+    )
+    fun payPerformanceSeat(id: Long): ResponseEntity<PerformanceSeatResponse>
 }

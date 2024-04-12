@@ -12,10 +12,20 @@ data class PerformanceSeatBookInfo(
 ) {
     fun toEntity(): PerformanceSeatBookInfoEntity {
         return PerformanceSeatBookInfoEntity(
+            id = performanceSeat?.id,
             performanceSeat = performanceSeat?.toEntity(),
             token = token,
             bookAttemptAt = bookAttemptAt,
             bookSuccessAt = bookSuccessAt
         )
+    }
+
+    fun isConfirmable(): Boolean {
+        /**
+         * can confirm booking if
+         * - bookSuccessAt is null
+         * - bookAttemptAt is 5 minutes before now
+         */
+        return bookSuccessAt == null && bookAttemptAt?.plusMinutes(5)?.isBefore(LocalDateTime.now()) ?: false
     }
 }

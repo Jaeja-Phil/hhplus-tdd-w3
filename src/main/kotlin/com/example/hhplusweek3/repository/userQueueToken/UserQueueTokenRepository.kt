@@ -31,4 +31,8 @@ class UserQueueTokenRepository(
     fun findByUserIdAndStatusNot(userId: UUID, status: UserQueueTokenStatus): List<UserQueueToken> {
         return userQueueTokenJpaRepository.findByUserIdAndStatusNot(userId, status).map { it.toDomain() }
     }
+
+    fun update(userQueueToken: UserQueueToken): UserQueueToken {
+        return userQueueTokenJpaRepository.save(userQueueToken.toEntity()).toDomain()
+    }
 }

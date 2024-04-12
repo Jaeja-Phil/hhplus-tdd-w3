@@ -93,6 +93,7 @@ class PerformanceSeatBookApplicationTest {
         every { concertPerformanceService.getById(any()) } returns concertPerformanceToReturn
         every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
         val performanceSeat = mockk<PerformanceSeat>() {
+            every { id } returns 1
             every { book(any()) } returns this
             every { concertPerformance } returns concertPerformanceToReturn
             every { seatNumber } returns 1
@@ -130,6 +131,7 @@ class PerformanceSeatBookApplicationTest {
         )
         every { concertPerformanceService.getById(any()) } returns concertPerformanceToReturn
         val performanceSeat = mockk<PerformanceSeat>() {
+            every { id } returns 1
             every { isAvailable() } returns true
             every { book(any()) } returns this
             every { concertPerformance } returns concertPerformanceToReturn

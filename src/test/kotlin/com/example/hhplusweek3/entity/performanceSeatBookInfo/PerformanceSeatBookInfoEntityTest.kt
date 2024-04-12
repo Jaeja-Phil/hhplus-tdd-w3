@@ -20,7 +20,8 @@ class PerformanceSeatBookInfoEntityTest {
             },
             token = "token",
             bookAttemptAt = now,
-            bookSuccessAt = now
+            bookSuccessAt = now,
+            id = 1
         )
 
         // when

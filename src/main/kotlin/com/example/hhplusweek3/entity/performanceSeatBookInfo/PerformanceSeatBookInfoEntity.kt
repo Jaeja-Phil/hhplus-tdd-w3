@@ -3,15 +3,17 @@ package com.example.hhplusweek3.entity.performanceSeatBookInfo
 import com.example.hhplusweek3.domain.performanceSeatBookInfo.PerformanceSeatBookInfo
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import jakarta.persistence.*
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "performance_seat_book_infos")
 data class PerformanceSeatBookInfoEntity(
     @Id
+    @Column(name = "performance_seat_id")
+    val id: Long?,
     @OneToOne
     @JoinColumn(name = "performance_seat_id", referencedColumnName = "id")
+    @MapsId
     val performanceSeat: PerformanceSeatEntity?,
     val token: String?,
     val bookAttemptAt: LocalDateTime?,

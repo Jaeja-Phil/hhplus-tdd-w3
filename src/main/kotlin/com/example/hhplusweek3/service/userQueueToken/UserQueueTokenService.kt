@@ -41,4 +41,8 @@ class UserQueueTokenService(
         val token = "${user.id}|${System.currentTimeMillis()}"
         return userQueueTokenRepository.save(UserQueueTokenCreateObject(user = user.toEntity(), token = token))
     }
+
+    fun expire(userQueueToken: UserQueueToken): UserQueueToken {
+        return userQueueTokenRepository.update(userQueueToken.copy(status = UserQueueTokenStatus.EXPIRED))
+    }
 }
