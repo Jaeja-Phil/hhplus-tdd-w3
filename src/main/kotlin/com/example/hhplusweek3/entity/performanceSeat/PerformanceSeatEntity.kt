@@ -1,9 +1,12 @@
 package com.example.hhplusweek3.entity.performanceSeat
 
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
 import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
+import com.example.hhplusweek3.entity.performanceSeatBookInfo.PerformanceSeatBookInfoEntity
 import com.example.hhplusweek3.entity.user.UserEntity
 import jakarta.persistence.*
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 
 @Entity
 @Table(
@@ -19,15 +22,31 @@ data class PerformanceSeatEntity(
     val seatNumber: Int,
     @ManyToOne
     val user: UserEntity?,
-    val booked: Boolean = false
+    val booked: Boolean = false,
+    @OneToOne(mappedBy = "performanceSeat", cascade = [CascadeType.ALL])
+    val performanceSeatBookInfo: PerformanceSeatBookInfoEntity?
 ) {
-    fun toDomain(): PerformanceSeat {
+    fun toDomain(includeBookInfo: Boolean = true): PerformanceSeat {
         return PerformanceSeat(
             id = requireNotNull(id),
             concertPerformance = concertPerformance.toDomain(),
             seatNumber = seatNumber,
             user = user?.toDomain(),
-            booked = booked
+            booked = booked,
+            performanceSeatBookInfo = if (includeBookInfo) performanceSeatBookInfo?.toDomain(!includeBookInfo) else null // to avoid infinite recursion
         )
+    }
+
+    companion object {
+        fun fromCreateObject(performanceSeatCreateObject: PerformanceSeatCreateObject): PerformanceSeatEntity {
+            return PerformanceSeatEntity(
+                id = null,
+                concertPerformance = performanceSeatCreateObject.concertPerformance.toEntity(),
+                seatNumber = performanceSeatCreateObject.seatNumber,
+                user = null,
+                booked = false,
+                performanceSeatBookInfo = null
+            )
+        }
     }
 }

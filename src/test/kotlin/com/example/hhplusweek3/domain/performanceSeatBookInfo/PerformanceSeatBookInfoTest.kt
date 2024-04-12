@@ -13,7 +13,6 @@ class PerformanceSeatBookInfoTest {
     fun `toEntity - should convert PerformanceSeatBookInfo to PerformanceSeatBookInfoEntity`() {
         // Given
         val performanceSeatBookInfo = PerformanceSeatBookInfo(
-            id = 1L,
             performanceSeat = mockk() {
                 every { toEntity() } returns mockk()
             },
@@ -26,10 +25,9 @@ class PerformanceSeatBookInfoTest {
         val result = performanceSeatBookInfo.toEntity()
 
         // Then
-        assertEquals(1L, result.id)
         assertEquals("token", result.token)
         assertEquals(now, result.bookAttemptAt)
         assertEquals(now, result.bookSuccessAt)
-        verify(exactly = 1) { performanceSeatBookInfo.performanceSeat.toEntity() }
+        verify(exactly = 1) { performanceSeatBookInfo.performanceSeat?.toEntity() }
     }
 }

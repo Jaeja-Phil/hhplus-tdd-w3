@@ -16,7 +16,8 @@ class PerformanceSeatEntityTest {
             concertPerformance = mockk(),
             seatNumber = 1,
             user = null,
-            booked = false
+            booked = false,
+            performanceSeatBookInfo = null
         )
 
         // When & Then
@@ -36,7 +37,8 @@ class PerformanceSeatEntityTest {
             concertPerformance = concertPerformance,
             seatNumber = 1,
             user = null,
-            booked = false
+            booked = false,
+            performanceSeatBookInfo = null
         )
 
         // When
