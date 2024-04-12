@@ -27,7 +27,7 @@ class TokenInterceptor(
 
         // if token is valid, set current user id to request attribute
         val userQueueToken = userQueueTokenService.getByToken(token!!) ?: return false // token is valid, so it should not be null
-        request.setAttribute("currentUser", userQueueToken.user)
+        request.setAttribute("currentUserQueueToken", userQueueToken)
 
         return true
     }
