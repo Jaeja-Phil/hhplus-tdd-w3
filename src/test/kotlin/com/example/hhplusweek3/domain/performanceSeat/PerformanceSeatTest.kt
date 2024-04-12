@@ -24,7 +24,8 @@ class PerformanceSeatTest {
             concertPerformance = concertPerformanceMock,
             seatNumber = 1,
             user = userMock,
-            booked = false
+            booked = false,
+            performanceSeatBookInfo = null
         )
 
         // When

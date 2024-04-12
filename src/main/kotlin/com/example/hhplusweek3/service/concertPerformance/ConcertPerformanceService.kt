@@ -15,4 +15,8 @@ class ConcertPerformanceService(
     fun getConcertById(id: Long): ConcertPerformance? {
         return concertPerformanceRepository.findById(id)
     }
+
+    fun getById(concertPerformanceId: Long): ConcertPerformance? {
+        return concertPerformanceRepository.findById(concertPerformanceId)
+    }
 }
