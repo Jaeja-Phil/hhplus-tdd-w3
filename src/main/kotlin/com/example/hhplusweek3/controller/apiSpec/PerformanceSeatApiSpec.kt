@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
 
 @Tag(name = "PerformanceSeat", description = "공연 좌석 API")
-interface PerformanceSeatApi {
+interface PerformanceSeatApiSpec {
     @GetMapping
     @Operation(
         summary = "공연 좌석 조회",

@@ -2,7 +2,7 @@ package com.example.hhplusweek3.controller
 
 import com.example.hhplusweek3.application.performanceSeat.PerformanceSeatBookApplication
 import com.example.hhplusweek3.application.performanceSeat.PerformanceSeatGetAllAvailableApplication
-import com.example.hhplusweek3.controller.apiSpec.PerformanceSeatApi
+import com.example.hhplusweek3.controller.apiSpec.PerformanceSeatApiSpec
 import com.example.hhplusweek3.controller.request.PerformanceSeatBookRequest
 import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
 import org.springframework.http.HttpStatus
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/performance-seats")
-class PerformanceSeatController(
+class PerformanceSeatControllerSpec(
     private val performanceSeatGetAllAvailableApplication: PerformanceSeatGetAllAvailableApplication,
     private val performanceSeatBookApplication: PerformanceSeatBookApplication,
-) : BaseController(), PerformanceSeatApi {
+) : BaseController(), PerformanceSeatApiSpec {
     override fun getAvailablePerformanceSeatsNumbers(@RequestParam concertPerformanceId: Long): ResponseEntity<List<Int>> {
         return ResponseEntity(performanceSeatGetAllAvailableApplication.run(concertPerformanceId), HttpStatus.OK)
     }
