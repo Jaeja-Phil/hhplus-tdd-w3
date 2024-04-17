@@ -6,7 +6,7 @@ import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObjec
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.service.concertPerformance.ConcertPerformanceService
+import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
 import com.example.hhplusweek3.service.performanceSeat.PerformanceSeatService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 @Transactional
 class PerformanceSeatBookApplication(
-    private val concertPerformanceService: ConcertPerformanceService,
+    private val concertPerformanceDomain: ConcertPerformanceDomain,
     private val performanceSeatService: PerformanceSeatService
 ) {
     fun run(request: PerformanceSeatBookRequest, userQueueToken: UserQueueToken): PerformanceSeatResponse {
         // 1. check if concert performance is available
-        val concertPerformance = concertPerformanceService
+        val concertPerformance = concertPerformanceDomain
             .getById(request.concertPerformanceId)
             ?: throw NotFoundException("Concert performance is not found.")
 

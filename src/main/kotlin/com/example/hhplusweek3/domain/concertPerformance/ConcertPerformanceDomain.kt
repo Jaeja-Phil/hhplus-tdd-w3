@@ -1,11 +1,11 @@
-package com.example.hhplusweek3.service.concertPerformance
+package com.example.hhplusweek3.domain.concertPerformance
 
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.repository.concertPerformance.ConcertPerformanceRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ConcertPerformanceService(
+class ConcertPerformanceDomain(
     private val concertPerformanceRepository: ConcertPerformanceRepository
 ) {
     fun getAvailableConcertPerformances(concertId: Long): List<ConcertPerformance> {

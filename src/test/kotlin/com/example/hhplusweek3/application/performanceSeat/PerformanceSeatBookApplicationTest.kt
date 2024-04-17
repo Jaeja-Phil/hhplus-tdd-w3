@@ -10,7 +10,7 @@ import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.service.concertPerformance.ConcertPerformanceService
+import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
 import com.example.hhplusweek3.service.performanceSeat.PerformanceSeatService
 import io.mockk.every
 import io.mockk.mockk
@@ -23,10 +23,10 @@ import java.time.LocalDateTime
 import java.util.*
 
 class PerformanceSeatBookApplicationTest {
-    private val concertPerformanceService: ConcertPerformanceService = mockk()
+    private val concertPerformanceDomain: ConcertPerformanceDomain = mockk()
     private val performanceSeatService = spyk(mockk<PerformanceSeatService>())
     private val performanceSeatBookApplication = PerformanceSeatBookApplication(
-        concertPerformanceService = concertPerformanceService,
+        concertPerformanceDomain = concertPerformanceDomain,
         performanceSeatService = performanceSeatService
     )
 
@@ -38,7 +38,7 @@ class PerformanceSeatBookApplicationTest {
             seatNumber = 1
         )
         val userQueueToken = mockk<UserQueueToken>()
-        every { concertPerformanceService.getById(any()) } returns null
+        every { concertPerformanceDomain.getById(any()) } returns null
 
         // when
         val thrown = assertThrows<NotFoundException> {
@@ -58,7 +58,7 @@ class PerformanceSeatBookApplicationTest {
         )
         val userQueueToken = mockk<UserQueueToken>()
         val concertPerformance = mockk<ConcertPerformance>()
-        every { concertPerformanceService.getById(any()) } returns concertPerformance
+        every { concertPerformanceDomain.getById(any()) } returns concertPerformance
         every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
             every { isAvailable() } returns false
         }
@@ -90,7 +90,7 @@ class PerformanceSeatBookApplicationTest {
             concert = concert,
             performanceDateTime = LocalDateTime.now()
         )
-        every { concertPerformanceService.getById(any()) } returns concertPerformanceToReturn
+        every { concertPerformanceDomain.getById(any()) } returns concertPerformanceToReturn
         every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
@@ -129,7 +129,7 @@ class PerformanceSeatBookApplicationTest {
             concert = concert,
             performanceDateTime = LocalDateTime.now()
         )
-        every { concertPerformanceService.getById(any()) } returns concertPerformanceToReturn
+        every { concertPerformanceDomain.getById(any()) } returns concertPerformanceToReturn
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
             every { isAvailable() } returns true
