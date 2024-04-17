@@ -3,7 +3,7 @@ package com.example.hhplusweek3.application.performanceSeat
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
-import com.example.hhplusweek3.service.performanceSeat.PerformanceSeatService
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class PerformanceSeatGetAllAvailableApplicationTest {
-    private val performanceSeatService = mockk<PerformanceSeatService>()
+    private val performanceSeatDomain = mockk<PerformanceSeatDomain>()
     private val concertPerformanceDomain = mockk<ConcertPerformanceDomain>()
     private val performanceSeatGetAllAvailableApplication = PerformanceSeatGetAllAvailableApplication(
-        performanceSeatService,
+        performanceSeatDomain,
         concertPerformanceDomain
     )
 
@@ -40,7 +40,7 @@ class PerformanceSeatGetAllAvailableApplicationTest {
         val concertPerformance = mockk<ConcertPerformance>()
         val availableSeatNumbers = listOf(1, 2, 3)
         every { concertPerformanceDomain.getConcertById(concertPerformanceId) } returns concertPerformance
-        every { performanceSeatService.getAllAvailableSeatNumbersByConcertPerformance(concertPerformance) } returns availableSeatNumbers
+        every { performanceSeatDomain.getAllAvailableSeatNumbersByConcertPerformance(concertPerformance) } returns availableSeatNumbers
 
         // when
         val result = performanceSeatGetAllAvailableApplication.run(concertPerformanceId)

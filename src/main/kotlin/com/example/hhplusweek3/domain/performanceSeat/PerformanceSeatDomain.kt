@@ -1,14 +1,12 @@
-package com.example.hhplusweek3.service.performanceSeat
+package com.example.hhplusweek3.domain.performanceSeat
 
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import org.springframework.stereotype.Service
 
 @Service
-class PerformanceSeatService(
+class PerformanceSeatDomain(
     private val performanceSeatRepository: PerformanceSeatRepository
 ) {
     fun getAllAvailableSeatNumbersByConcertPerformance(concertPerformance: ConcertPerformance): List<Int> {

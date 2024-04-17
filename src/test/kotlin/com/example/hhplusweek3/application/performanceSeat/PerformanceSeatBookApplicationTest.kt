@@ -11,7 +11,7 @@ import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
-import com.example.hhplusweek3.service.performanceSeat.PerformanceSeatService
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -24,10 +24,10 @@ import java.util.*
 
 class PerformanceSeatBookApplicationTest {
     private val concertPerformanceDomain: ConcertPerformanceDomain = mockk()
-    private val performanceSeatService = spyk(mockk<PerformanceSeatService>())
+    private val performanceSeatDomain = spyk(mockk<PerformanceSeatDomain>())
     private val performanceSeatBookApplication = PerformanceSeatBookApplication(
         concertPerformanceDomain = concertPerformanceDomain,
-        performanceSeatService = performanceSeatService
+        performanceSeatDomain = performanceSeatDomain
     )
 
     @Test
@@ -59,7 +59,7 @@ class PerformanceSeatBookApplicationTest {
         val userQueueToken = mockk<UserQueueToken>()
         val concertPerformance = mockk<ConcertPerformance>()
         every { concertPerformanceDomain.getById(any()) } returns concertPerformance
-        every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
+        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
             every { isAvailable() } returns false
         }
 
@@ -91,7 +91,7 @@ class PerformanceSeatBookApplicationTest {
             performanceDateTime = LocalDateTime.now()
         )
         every { concertPerformanceDomain.getById(any()) } returns concertPerformanceToReturn
-        every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
+        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
             every { book(any()) } returns this
@@ -99,15 +99,15 @@ class PerformanceSeatBookApplicationTest {
             every { seatNumber } returns 1
             every { booked } returns false
         }
-        every { performanceSeatService.createPerformanceSeat(any()) } returns performanceSeat
-        every { performanceSeatService.update(any()) } returns performanceSeat
+        every { performanceSeatDomain.createPerformanceSeat(any()) } returns performanceSeat
+        every { performanceSeatDomain.update(any()) } returns performanceSeat
 
         // when
         val result = performanceSeatBookApplication.run(request, userQueueToken)
 
         // then
-        verify(exactly = 1) { performanceSeatService.createPerformanceSeat(any()) }
-        verify(exactly = 1) { performanceSeatService.update(any()) }
+        verify(exactly = 1) { performanceSeatDomain.createPerformanceSeat(any()) }
+        verify(exactly = 1) { performanceSeatDomain.update(any()) }
         assertEquals(PerformanceSeatResponse.from(performanceSeat), result)
     }
 
@@ -138,15 +138,15 @@ class PerformanceSeatBookApplicationTest {
             every { seatNumber } returns 1
             every { booked } returns false
         }
-        every { performanceSeatService.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns performanceSeat
-        every { performanceSeatService.update(any()) } returns performanceSeat
+        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns performanceSeat
+        every { performanceSeatDomain.update(any()) } returns performanceSeat
 
         // when
         val result = performanceSeatBookApplication.run(request, userQueueToken)
 
         // then
-        verify(exactly = 0) { performanceSeatService.createPerformanceSeat(any()) }
-        verify(exactly = 1) { performanceSeatService.update(any()) }
+        verify(exactly = 0) { performanceSeatDomain.createPerformanceSeat(any()) }
+        verify(exactly = 1) { performanceSeatDomain.update(any()) }
         assertEquals(PerformanceSeatResponse.from(performanceSeat), result)
     }
 }

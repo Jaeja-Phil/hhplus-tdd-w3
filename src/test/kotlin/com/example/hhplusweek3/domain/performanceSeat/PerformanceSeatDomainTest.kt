@@ -1,9 +1,10 @@
-package com.example.hhplusweek3.service.performanceSeat
+package com.example.hhplusweek3.domain.performanceSeat
 
 import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -11,9 +12,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-class PerformanceSeatServiceTest {
+class PerformanceSeatDomainTest {
     private val performanceSeatRepository = mockk<PerformanceSeatRepository>()
-    private val performanceSeatService = PerformanceSeatService(performanceSeatRepository)
+    private val performanceSeatDomain = PerformanceSeatDomain(performanceSeatRepository)
 
     @Test
     fun `getAllAvailableSeatNumbersByConcertPerformance - should return available seat numbers`() {
@@ -43,7 +44,7 @@ class PerformanceSeatServiceTest {
         )
 
         // when
-        val result = performanceSeatService.getAllAvailableSeatNumbersByConcertPerformance(concertPerformance)
+        val result = performanceSeatDomain.getAllAvailableSeatNumbersByConcertPerformance(concertPerformance)
 
         // then
         assertEquals(listOf(2), result)
@@ -70,7 +71,7 @@ class PerformanceSeatServiceTest {
         )
 
         // when
-        val result = performanceSeatService.getBySeatNumberAndConcertPerformanceId(seatNumber, concertPerformanceId)
+        val result = performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(seatNumber, concertPerformanceId)
 
         // then
         assertEquals(seatNumber, result?.seatNumber)
@@ -96,7 +97,7 @@ class PerformanceSeatServiceTest {
         )
 
         // when
-        val result = performanceSeatService.createPerformanceSeat(performanceSeatCreateObject)
+        val result = performanceSeatDomain.createPerformanceSeat(performanceSeatCreateObject)
 
         // then
         assertEquals(1, result.seatNumber)
@@ -131,7 +132,7 @@ class PerformanceSeatServiceTest {
         )
 
         // when
-        val result = performanceSeatService.update(performanceSeat)
+        val result = performanceSeatDomain.update(performanceSeat)
 
         // then
         assertEquals(1, result.seatNumber)

@@ -7,7 +7,7 @@ import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
-import com.example.hhplusweek3.service.performanceSeat.PerformanceSeatService
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class PerformanceSeatBookApplication(
     private val concertPerformanceDomain: ConcertPerformanceDomain,
-    private val performanceSeatService: PerformanceSeatService
+    private val performanceSeatDomain: PerformanceSeatDomain
 ) {
     fun run(request: PerformanceSeatBookRequest, userQueueToken: UserQueueToken): PerformanceSeatResponse {
         // 1. check if concert performance is available
@@ -24,7 +24,7 @@ class PerformanceSeatBookApplication(
             ?: throw NotFoundException("Concert performance is not found.")
 
         // 2. check if performance seat is available
-        var performanceSeat = performanceSeatService.getBySeatNumberAndConcertPerformanceId(
+        var performanceSeat = performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
             seatNumber = request.seatNumber,
             concertPerformanceId = request.concertPerformanceId
         )
@@ -34,7 +34,7 @@ class PerformanceSeatBookApplication(
 
         // 3. book performance seat
         if (performanceSeat == null) {
-            performanceSeat = performanceSeatService.createPerformanceSeat(
+            performanceSeat = performanceSeatDomain.createPerformanceSeat(
                 PerformanceSeatCreateObject(
                     seatNumber = request.seatNumber,
                     concertPerformance = concertPerformance,
@@ -42,7 +42,7 @@ class PerformanceSeatBookApplication(
             )
         }
         val bookedPerformanceSeat = performanceSeat.book(userQueueToken)
-        val updatedPerformanceSeat = performanceSeatService.update(bookedPerformanceSeat)
+        val updatedPerformanceSeat = performanceSeatDomain.update(bookedPerformanceSeat)
         return PerformanceSeatResponse.from(updatedPerformanceSeat)
     }
 }
