@@ -24,7 +24,8 @@ class PerformanceSeatRepositoryTest {
             booked = booked,
             seatNumber = 1,
             user = null,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
         every {
             performanceSeatJpaRepository.findAllByConcertPerformanceIdAndBookedAndUserId(
@@ -60,7 +61,8 @@ class PerformanceSeatRepositoryTest {
             booked = false,
             seatNumber = seatNumber,
             user = null,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
         every {
             performanceSeatJpaRepository.findBySeatNumberAndConcertPerformanceId(
@@ -97,7 +99,8 @@ class PerformanceSeatRepositoryTest {
             booked = false,
             seatNumber = 1,
             user = null,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
         every { performanceSeatJpaRepository.save(any()) } returns performanceSeatEntity
 
@@ -119,7 +122,8 @@ class PerformanceSeatRepositoryTest {
             booked = false,
             seatNumber = 1,
             user = null,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
         every { performanceSeatJpaRepository.save(any()) } returns performanceSeatEntity
 

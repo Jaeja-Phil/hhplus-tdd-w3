@@ -17,7 +17,8 @@ class PerformanceSeatEntityTest {
             seatNumber = 1,
             user = null,
             booked = false,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
 
         // When & Then
@@ -38,7 +39,8 @@ class PerformanceSeatEntityTest {
             seatNumber = 1,
             user = null,
             booked = false,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
 
         // When

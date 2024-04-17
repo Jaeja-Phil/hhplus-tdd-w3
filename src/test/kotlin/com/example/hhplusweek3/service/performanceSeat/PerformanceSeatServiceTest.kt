@@ -4,7 +4,6 @@ import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
-import com.example.hhplusweek3.domain.performanceSeatBookInfo.PerformanceSeatBookInfo
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -38,7 +37,8 @@ class PerformanceSeatServiceTest {
                 seatNumber = 1,
                 user = null,
                 booked = true,
-                performanceSeatBookInfo = null
+                bookAttemptAt = null,
+                bookSuccessAt = null
             )
         )
 
@@ -65,7 +65,8 @@ class PerformanceSeatServiceTest {
             seatNumber = seatNumber,
             user = null,
             booked = false,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
 
         // when
@@ -90,7 +91,8 @@ class PerformanceSeatServiceTest {
             seatNumber = 1,
             user = null,
             booked = false,
-            performanceSeatBookInfo = null
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
 
         // when
@@ -103,9 +105,6 @@ class PerformanceSeatServiceTest {
     @Test
     fun `update - should return updated performance seat`() {
         // given
-        val performanceSeatBookInfoMock = mockk<PerformanceSeatBookInfo>() {
-            every { toEntity() } returns mockk()
-        }
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
             every { toEntity() } returns mockk()
@@ -115,7 +114,8 @@ class PerformanceSeatServiceTest {
             }
             every { user } returns null
             every { booked } returns false
-            every { performanceSeatBookInfo } returns performanceSeatBookInfoMock
+            every { bookAttemptAt } returns null
+            every { bookSuccessAt } returns null
         }
 
         every {
@@ -126,7 +126,8 @@ class PerformanceSeatServiceTest {
             seatNumber = 1,
             user = null,
             booked = false,
-            performanceSeatBookInfo = performanceSeatBookInfoMock
+            bookAttemptAt = null,
+            bookSuccessAt = null
         )
 
         // when

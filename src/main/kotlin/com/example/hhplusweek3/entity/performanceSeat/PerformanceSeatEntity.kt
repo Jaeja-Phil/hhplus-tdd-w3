@@ -3,15 +3,14 @@ package com.example.hhplusweek3.entity.performanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
 import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
-import com.example.hhplusweek3.entity.performanceSeatBookInfo.PerformanceSeatBookInfoEntity
 import com.example.hhplusweek3.entity.user.UserEntity
 import jakarta.persistence.*
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
+import java.time.LocalDateTime
 
 @Entity
 @Table(
     name = "performance_seats",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["concert_performance_id", "seatNumber"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["concert_performance_id", "seat_number"])]
 )
 data class PerformanceSeatEntity(
     @Id
@@ -21,19 +20,20 @@ data class PerformanceSeatEntity(
     val concertPerformance: ConcertPerformanceEntity,
     val seatNumber: Int,
     @ManyToOne
-    val user: UserEntity?,
+    val user: UserEntity? = null,
     val booked: Boolean = false,
-    @OneToOne(mappedBy = "performanceSeat", cascade = [CascadeType.ALL])
-    val performanceSeatBookInfo: PerformanceSeatBookInfoEntity?
+    val bookAttemptAt: LocalDateTime? = null,
+    val bookSuccessAt: LocalDateTime? = null,
 ) {
-    fun toDomain(includeBookInfo: Boolean = true): PerformanceSeat {
+    fun toDomain(): PerformanceSeat {
         return PerformanceSeat(
             id = requireNotNull(id),
             concertPerformance = concertPerformance.toDomain(),
             seatNumber = seatNumber,
             user = user?.toDomain(),
             booked = booked,
-            performanceSeatBookInfo = if (includeBookInfo) performanceSeatBookInfo?.toDomain() else null
+            bookAttemptAt = bookAttemptAt,
+            bookSuccessAt = bookSuccessAt,
         )
     }
 
@@ -43,9 +43,7 @@ data class PerformanceSeatEntity(
                 id = null,
                 concertPerformance = performanceSeatCreateObject.concertPerformance.toEntity(),
                 seatNumber = performanceSeatCreateObject.seatNumber,
-                user = null,
                 booked = false,
-                performanceSeatBookInfo = null
             )
         }
 
@@ -56,7 +54,8 @@ data class PerformanceSeatEntity(
                 seatNumber = performanceSeat.seatNumber,
                 user = performanceSeat.user?.toEntity(),
                 booked = performanceSeat.booked,
-                performanceSeatBookInfo = performanceSeat.performanceSeatBookInfo?.toEntity()
+                bookAttemptAt = performanceSeat.bookAttemptAt,
+                bookSuccessAt = performanceSeat.bookSuccessAt,
             )
         }
     }

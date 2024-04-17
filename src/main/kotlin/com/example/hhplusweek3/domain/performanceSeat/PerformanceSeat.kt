@@ -1,7 +1,6 @@
 package com.example.hhplusweek3.domain.performanceSeat
 
 import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
-import com.example.hhplusweek3.domain.performanceSeatBookInfo.PerformanceSeatBookInfo
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
@@ -14,7 +13,8 @@ data class PerformanceSeat(
     val seatNumber: Int,
     val user: User?,
     val booked: Boolean,
-    val performanceSeatBookInfo: PerformanceSeatBookInfo?
+    val bookAttemptAt: LocalDateTime?,
+    val bookSuccessAt: LocalDateTime?,
 ) {
     fun toEntity(): PerformanceSeatEntity {
         return PerformanceSeatEntity(
@@ -23,25 +23,16 @@ data class PerformanceSeat(
             seatNumber = seatNumber,
             user = user?.toEntity(),
             booked = booked,
-            performanceSeatBookInfo = performanceSeatBookInfo?.toEntity()
+            bookAttemptAt = bookAttemptAt,
+            bookSuccessAt = bookSuccessAt,
         )
     }
 
     fun isAvailable(): Boolean {
         val now = LocalDateTime.now()
 
-        if (booked ||
-            concertPerformance.performanceDateTime.isBefore(now) ||
-            performanceSeatBookInfo?.bookSuccessAt != null) {
-            return false
-        }
-
-        if (performanceSeatBookInfo?.bookAttemptAt != null &&
-            performanceSeatBookInfo.bookAttemptAt.isAfter(now.minusMinutes(5))) {
-            return false
-        }
-
-        return true
+        return !(booked || bookSuccessAt != null || concertPerformance.performanceDateTime.isBefore(now) ||
+                bookAttemptAt?.isAfter(now.minusMinutes(5)) == true)
     }
 
     fun book(userQueueToken: UserQueueToken): PerformanceSeat {
@@ -52,29 +43,22 @@ data class PerformanceSeat(
         val now = LocalDateTime.now()
         return copy(
             user = userQueueToken.user,
-            performanceSeatBookInfo = PerformanceSeatBookInfo(
-                performanceSeat = this,
-                token = userQueueToken.token,
-                bookAttemptAt = now,
-                bookSuccessAt = null
-            )
+            bookAttemptAt = now
         )
     }
 
     fun confirm(token: String): PerformanceSeat {
-        if (performanceSeatBookInfo?.token != token) {
+        // TODO: add performanceSeat information to userQueueToken
+        /*if (performanceSeatBookInfo?.token != token) {
             throw BadRequestException("Invalid token.")
         }
 
         if (!performanceSeatBookInfo.isConfirmable()) {
             throw BadRequestException("Performance seat is not confirmable.")
-        }
-
+        }*/
         return copy(
             booked = true,
-            performanceSeatBookInfo = performanceSeatBookInfo.copy(
-                bookSuccessAt = LocalDateTime.now()
-            )
+            bookSuccessAt = LocalDateTime.now()
         )
     }
 }
