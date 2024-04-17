@@ -1,15 +1,13 @@
-package com.example.hhplusweek3.service.userQueueToken
+package com.example.hhplusweek3.domain.userQueueToken
 
 import com.example.hhplusweek3.domain.user.User
-import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
-import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenCreateObject
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.repository.userQueueToken.UserQueueTokenRepository
 import org.springframework.stereotype.Service
 
 @Service
-class UserQueueTokenService(
+class UserQueueTokenDomain(
     private val userQueueTokenRepository: UserQueueTokenRepository
 ) {
     fun createUserQueueTokenWithValidation(user: User): UserQueueToken {

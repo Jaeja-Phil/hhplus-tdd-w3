@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.config.interceptor
 
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
-import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 
 @Component
 class TokenInterceptor(
-    private val userQueueTokenService: UserQueueTokenService
+    private val userQueueTokenDomain: UserQueueTokenDomain
 ) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if (isTokenRequired(request).not()) {
@@ -26,7 +26,7 @@ class TokenInterceptor(
         }
 
         // if token is valid, set current user id to request attribute
-        val userQueueToken = userQueueTokenService.getByToken(token!!) ?: return false // token is valid, so it should not be null
+        val userQueueToken = userQueueTokenDomain.getByToken(token!!) ?: return false // token is valid, so it should not be null
         request.setAttribute("currentUserQueueToken", userQueueToken)
 
         return true
@@ -36,7 +36,7 @@ class TokenInterceptor(
         if (token == null) {
             return false
         }
-        return userQueueTokenService.getByToken(token)?.status == UserQueueTokenStatus.IN_PROGRESS
+        return userQueueTokenDomain.getByToken(token)?.status == UserQueueTokenStatus.IN_PROGRESS
     }
 
     private fun isTokenRequired(request: HttpServletRequest): Boolean {

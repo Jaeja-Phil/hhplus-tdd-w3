@@ -4,7 +4,7 @@ import com.example.hhplusweek3.controller.response.TokenResponse
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.user.UserDomain
-import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,9 +13,9 @@ import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class UserQueueTokenCreateApplicationTest {
-    private val userQueueTokenService = mockk<UserQueueTokenService>()
+    private val userQueueTokenDomain = mockk<UserQueueTokenDomain>()
     private val userDomain = mockk<UserDomain>()
-    private val SUT = UserQueueTokenCreateApplication(userQueueTokenService, userDomain)
+    private val SUT = UserQueueTokenCreateApplication(userQueueTokenDomain, userDomain)
 
     @Test
     fun `run - should raise error when user not found`() {
@@ -38,7 +38,7 @@ class UserQueueTokenCreateApplicationTest {
         val userId = UUID.randomUUID()
         val user = mockk<User>()
         every { userDomain.getUserById(userId) } returns user
-        every { userQueueTokenService.createUserQueueTokenWithValidation(user) } throws
+        every { userQueueTokenDomain.createUserQueueTokenWithValidation(user) } throws
                 RuntimeException("some error inside")
 
         // When
@@ -57,7 +57,7 @@ class UserQueueTokenCreateApplicationTest {
         val user = mockk<User>()
         val expectedToken = "token"
         every { userDomain.getUserById(userId) } returns user
-        every { userQueueTokenService.createUserQueueTokenWithValidation(user) } returns mockk {
+        every { userQueueTokenDomain.createUserQueueTokenWithValidation(user) } returns mockk {
             every { token } returns expectedToken
         }
 

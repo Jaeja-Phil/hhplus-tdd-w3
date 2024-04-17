@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.config.interceptor
 
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
-import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class TokenInterceptorTest {
-    private val userQueueTokenService = mockk<UserQueueTokenService>()
-    private val tokenInterceptor = spyk(TokenInterceptor(userQueueTokenService), recordPrivateCalls = true)
+    private val userQueueTokenDomain = mockk<UserQueueTokenDomain>()
+    private val tokenInterceptor = spyk(TokenInterceptor(userQueueTokenDomain), recordPrivateCalls = true)
 
     @Test
     fun `preHandle - should return true when token is not required`() {
@@ -73,7 +73,7 @@ class TokenInterceptorTest {
         every { tokenInterceptor["isTokenRequired"](request) } answers { true }
         every { tokenInterceptor["getToken"](request) } answers { "token" }
         every { tokenInterceptor["isValidToken"]("token") } answers { true }
-        every { userQueueTokenService.getByToken("token") } answers { userQueueToken }
+        every { userQueueTokenDomain.getByToken("token") } answers { userQueueToken }
         every { request.setAttribute("currentUserQueueToken", userQueueToken) } answers { Unit }
 
         // when
@@ -84,7 +84,7 @@ class TokenInterceptorTest {
         verify(exactly = 1) { tokenInterceptor["isTokenRequired"](request) }
         verify(exactly = 1) { tokenInterceptor["getToken"](request) }
         verify(exactly = 1) { tokenInterceptor["isValidToken"]("token") }
-        verify(exactly = 1) { userQueueTokenService.getByToken("token") }
+        verify(exactly = 1) { userQueueTokenDomain.getByToken("token") }
         verify(exactly = 1) { request.setAttribute("currentUserQueueToken", userQueueToken) }
     }
 }

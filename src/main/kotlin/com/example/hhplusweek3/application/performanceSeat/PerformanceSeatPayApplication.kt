@@ -5,7 +5,7 @@ import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import com.example.hhplusweek3.domain.user.UserDomain
-import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class PerformanceSeatPayApplication(
     private val userDomain: UserDomain,
-    private val userQueueTokenService: UserQueueTokenService,
+    private val userQueueTokenDomain: UserQueueTokenDomain,
     private val performanceSeatDomain: PerformanceSeatDomain,
 ) {
     fun run(userQueueToken: UserQueueToken, performanceSeatId: Long): PerformanceSeatResponse {
@@ -27,7 +27,7 @@ class PerformanceSeatPayApplication(
         val confirmAppliedPerformanceSeat = performanceSeat.confirm(userQueueToken.token)
         val updatedPerformanceSeat = performanceSeatDomain.update(confirmAppliedPerformanceSeat)
         // expire user-queue-token
-        userQueueTokenService.expire(userQueueToken)
+        userQueueTokenDomain.expire(userQueueToken)
 
         // return booked performance seat information
         return PerformanceSeatResponse.from(updatedPerformanceSeat)

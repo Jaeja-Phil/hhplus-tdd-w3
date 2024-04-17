@@ -1,6 +1,7 @@
-package com.example.hhplusweek3.service.userQueueToken
+package com.example.hhplusweek3.domain.userQueueToken
 
 import com.example.hhplusweek3.domain.user.User
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.repository.userQueueToken.UserQueueTokenRepository
 import io.mockk.*
@@ -9,25 +10,25 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
 
-class UserQueueTokenServiceTest {
+class UserQueueTokenDomainTest {
     private val userQueueTokenRepository = mockk<UserQueueTokenRepository>()
-    private val userQueueTokenService = spyk(UserQueueTokenService(userQueueTokenRepository))
+    private val userQueueTokenDomain = spyk(UserQueueTokenDomain(userQueueTokenRepository))
 
     @Test
     fun `createUserQueueTokenWithValidation - should create user queue token with validation`() {
         // Given
         val user = User(id = UUID.randomUUID(), balance = 100.0)
-        justRun { userQueueTokenService.validateUserForTokenCreation(user) }
+        justRun { userQueueTokenDomain.validateUserForTokenCreation(user) }
         every { userQueueTokenRepository.save(any()) } returns mockk()
 
         // When
-        userQueueTokenService.createUserQueueTokenWithValidation(user)
+        userQueueTokenDomain.createUserQueueTokenWithValidation(user)
 
         // Then
-        verify(exactly = 1) { userQueueTokenService.validateUserForTokenCreation(user) }
+        verify(exactly = 1) { userQueueTokenDomain.validateUserForTokenCreation(user) }
         verify(exactly = 1) { userQueueTokenRepository.save(any()) }
         verifyOrder {
-            userQueueTokenService.validateUserForTokenCreation(user)
+            userQueueTokenDomain.validateUserForTokenCreation(user)
             userQueueTokenRepository.save(any())
         }
     }
@@ -40,7 +41,7 @@ class UserQueueTokenServiceTest {
 
         // When
         val exception = assertThrows<BadRequestException> {
-            userQueueTokenService.validateUserForTokenCreation(user)
+            userQueueTokenDomain.validateUserForTokenCreation(user)
         }
 
         // Then
@@ -55,7 +56,7 @@ class UserQueueTokenServiceTest {
         every { userQueueTokenRepository.findByUserIdAndStatusNot(any(), any()) } returns emptyList()
 
         // When
-        userQueueTokenService.validateUserForTokenCreation(user)
+        userQueueTokenDomain.validateUserForTokenCreation(user)
 
         // Then
         verify(exactly = 1) { userQueueTokenRepository.findByUserIdAndStatusNot(user.id, any()) }
