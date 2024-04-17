@@ -1,6 +1,7 @@
-package com.example.hhplusweek3.domain.concertPerformance
+package com.example.hhplusweek3.domain.concert
 
 import com.example.hhplusweek3.domain.concert.Concert
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.entity.concert.ConcertEntity
 import io.mockk.every
 import io.mockk.mockk

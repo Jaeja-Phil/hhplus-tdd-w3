@@ -6,7 +6,7 @@ import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObjec
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional

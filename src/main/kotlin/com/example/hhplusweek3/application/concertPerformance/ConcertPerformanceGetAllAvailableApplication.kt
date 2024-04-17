@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.application.concertPerformance
 
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import org.springframework.stereotype.Component
 
 @Component

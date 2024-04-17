@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.domain.performanceSeat
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.entity.performanceSeat.PerformanceSeatEntity
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import org.springframework.stereotype.Service

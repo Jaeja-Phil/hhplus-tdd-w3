@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.controller.response
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import java.time.LocalDateTime
 
 data class ConcertPerformanceResponse(

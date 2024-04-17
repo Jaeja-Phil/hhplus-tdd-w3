@@ -1,8 +1,8 @@
 package com.example.hhplusweek3.application.performanceSeat
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import io.mockk.every
 import io.mockk.mockk

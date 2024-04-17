@@ -1,7 +1,6 @@
-package com.example.hhplusweek3.domain.concertPerformance
+package com.example.hhplusweek3.domain.concert
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
-import com.example.hhplusweek3.repository.concertPerformance.ConcertPerformanceRepository
+import com.example.hhplusweek3.repository.concert.ConcertPerformanceRepository
 import org.springframework.stereotype.Service
 
 @Service

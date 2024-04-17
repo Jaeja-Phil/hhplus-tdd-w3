@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.entity.concertPerformance
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.entity.concert.ConcertEntity
 import jakarta.persistence.*
 import java.time.LocalDateTime

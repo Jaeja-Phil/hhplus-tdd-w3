@@ -1,6 +1,6 @@
-package com.example.hhplusweek3.repository.concertPerformance
+package com.example.hhplusweek3.repository.concert
 
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 

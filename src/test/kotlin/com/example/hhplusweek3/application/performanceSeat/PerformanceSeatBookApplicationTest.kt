@@ -3,14 +3,14 @@ package com.example.hhplusweek3.application.performanceSeat
 import com.example.hhplusweek3.controller.request.PerformanceSeatBookRequest
 import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
 import com.example.hhplusweek3.domain.concert.Concert
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import io.mockk.every
 import io.mockk.mockk

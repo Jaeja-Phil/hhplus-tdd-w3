@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.application.performanceSeat
 
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import org.springframework.stereotype.Component
 

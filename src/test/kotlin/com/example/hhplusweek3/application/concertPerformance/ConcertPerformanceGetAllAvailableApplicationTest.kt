@@ -1,8 +1,8 @@
 package com.example.hhplusweek3.application.concertPerformance
 
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformanceDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
+import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals

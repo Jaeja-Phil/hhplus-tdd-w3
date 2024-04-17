@@ -1,10 +1,7 @@
 package com.example.hhplusweek3.domain.performanceSeat
 
 import com.example.hhplusweek3.domain.concert.Concert
-import com.example.hhplusweek3.domain.concertPerformance.ConcertPerformance
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
+import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import io.mockk.every
 import io.mockk.mockk
