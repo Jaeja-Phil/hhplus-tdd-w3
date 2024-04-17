@@ -1,4 +1,4 @@
-package com.example.hhplusweek3.domain
+package com.example.hhplusweek3.domain.user
 
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.error.NotEnoughBalanceException

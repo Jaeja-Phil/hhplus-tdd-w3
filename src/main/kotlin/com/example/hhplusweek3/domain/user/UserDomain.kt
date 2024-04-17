@@ -1,4 +1,4 @@
-package com.example.hhplusweek3.service.user
+package com.example.hhplusweek3.domain.user
 
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.user.UserCreateObject
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserService(
+class UserDomain(
     private val userRepository: UserRepository
 ) {
     fun createUser(balance: Double = 0.0): User {

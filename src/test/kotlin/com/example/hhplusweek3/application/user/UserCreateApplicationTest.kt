@@ -2,7 +2,7 @@ package com.example.hhplusweek3.application.user
 
 import com.example.hhplusweek3.controller.request.UserCreateRequest
 import com.example.hhplusweek3.domain.user.User
-import com.example.hhplusweek3.service.user.UserService
+import com.example.hhplusweek3.domain.user.UserDomain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,8 +12,8 @@ import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class UserCreateApplicationTest {
-    private val userService = mockk<UserService>()
-    private val userCreateApplication = UserCreateApplication(userService)
+    private val userDomain = mockk<UserDomain>()
+    private val userCreateApplication = UserCreateApplication(userDomain)
 
     @Test
     fun `run - should raise error when creating user fails`() {
@@ -21,7 +21,7 @@ class UserCreateApplicationTest {
         val balance = 100.0
         val request = UserCreateRequest(balance = balance)
         val errorMessage = "Failed to create user"
-        every { userService.createUser(balance) } throws RuntimeException(errorMessage)
+        every { userDomain.createUser(balance) } throws RuntimeException(errorMessage)
 
         // When & Then
         val error = assertThrows<RuntimeException> {
@@ -36,7 +36,7 @@ class UserCreateApplicationTest {
         val balance = 100.0
         val user = User(id = UUID.randomUUID(), balance = balance)
         val request = UserCreateRequest(balance = balance)
-        every { userService.createUser(balance) } returns user
+        every { userDomain.createUser(balance) } returns user
 
         // When
         val result = userCreateApplication.run(request)
@@ -44,6 +44,6 @@ class UserCreateApplicationTest {
         // Then
         assertEquals(user.id, result.id)
         assertEquals(user.balance, result.balance)
-        verify { userService.createUser(balance) }
+        verify { userDomain.createUser(balance) }
     }
 }

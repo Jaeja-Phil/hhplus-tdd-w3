@@ -4,7 +4,7 @@ import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.error.NotFoundException
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
-import com.example.hhplusweek3.service.user.UserService
+import com.example.hhplusweek3.domain.user.UserDomain
 import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 @Transactional
 class PerformanceSeatPayApplication(
-    private val userService: UserService,
+    private val userDomain: UserDomain,
     private val userQueueTokenService: UserQueueTokenService,
     private val performanceSeatDomain: PerformanceSeatDomain,
 ) {
@@ -22,7 +22,7 @@ class PerformanceSeatPayApplication(
                 ?: throw NotFoundException("Performance seat not found")
 
         // TODO: assume the price is 100.0 here, but it should be fetched from actual column
-        userService.adjustUserBalance(userQueueToken.user, -100.0)
+        userDomain.adjustUserBalance(userQueueToken.user, -100.0)
         // update performance seat
         val confirmAppliedPerformanceSeat = performanceSeat.confirm(userQueueToken.token)
         val updatedPerformanceSeat = performanceSeatDomain.update(confirmAppliedPerformanceSeat)

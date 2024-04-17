@@ -1,7 +1,8 @@
-package com.example.hhplusweek3.service.user
+package com.example.hhplusweek3.domain.user
 
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.user.UserCreateObject
+import com.example.hhplusweek3.domain.user.UserDomain
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.repository.user.UserRepository
 import io.mockk.every
@@ -13,9 +14,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
 
-class UserServiceTest {
+class UserDomainTest {
     private val userRepository = mockk<UserRepository>()
-    private val userService = UserService(userRepository)
+    private val userDomain = UserDomain(userRepository)
 
     @Test
     fun `createUser - should raise error when balance is negative`() {
@@ -24,7 +25,7 @@ class UserServiceTest {
 
         // When & Then
         val error = assertThrows<BadRequestException> {
-            userService.createUser(balance)
+            userDomain.createUser(balance)
         }
         assertEquals("Balance should not be negative.", error.message)
     }
@@ -35,7 +36,7 @@ class UserServiceTest {
         every { userRepository.save(UserCreateObject(balance = balance)) } returns mockk()
 
         // When
-        userService.createUser(balance)
+        userDomain.createUser(balance)
 
         // Then
         verify { userRepository.save(UserCreateObject(balance = balance)) }
@@ -49,7 +50,7 @@ class UserServiceTest {
         every { userRepository.findById(id) } returns user
 
         // When
-        val result = userService.getUserById(id)
+        val result = userDomain.getUserById(id)
 
         // Then
         assertEquals(user, result)
@@ -62,7 +63,7 @@ class UserServiceTest {
         every { userRepository.findById(id) } returns null
 
         // When
-        val result = userService.getUserById(id)
+        val result = userDomain.getUserById(id)
 
         // Then
         assertNull(result)
@@ -78,7 +79,7 @@ class UserServiceTest {
 
         // When & Then
         val error = assertThrows<BadRequestException> {
-            userService.adjustUserBalance(user, amount)
+            userDomain.adjustUserBalance(user, amount)
         }
         assertEquals("Not enough balance.", error.message)
     }
@@ -93,7 +94,7 @@ class UserServiceTest {
         every { userRepository.update(any()) } returns mockk()
 
         // When
-        userService.adjustUserBalance(user, amount)
+        userDomain.adjustUserBalance(user, amount)
 
         // Then
         verify(exactly = 1) { user.adjustBalance(amount) }

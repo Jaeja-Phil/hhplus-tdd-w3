@@ -3,7 +3,7 @@ package com.example.hhplusweek3.application.userQueueToken
 import com.example.hhplusweek3.controller.response.TokenResponse
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.service.user.UserService
+import com.example.hhplusweek3.domain.user.UserDomain
 import com.example.hhplusweek3.service.userQueueToken.UserQueueTokenService
 import io.mockk.every
 import io.mockk.mockk
@@ -14,14 +14,14 @@ import java.util.*
 
 class UserQueueTokenCreateApplicationTest {
     private val userQueueTokenService = mockk<UserQueueTokenService>()
-    private val userService = mockk<UserService>()
-    private val SUT = UserQueueTokenCreateApplication(userQueueTokenService, userService)
+    private val userDomain = mockk<UserDomain>()
+    private val SUT = UserQueueTokenCreateApplication(userQueueTokenService, userDomain)
 
     @Test
     fun `run - should raise error when user not found`() {
         // Given
         val userId = UUID.randomUUID()
-        every { userService.getUserById(userId) } returns null
+        every { userDomain.getUserById(userId) } returns null
 
         // When
         val exception = assertThrows<NotFoundException> {
@@ -37,7 +37,7 @@ class UserQueueTokenCreateApplicationTest {
         // Given
         val userId = UUID.randomUUID()
         val user = mockk<User>()
-        every { userService.getUserById(userId) } returns user
+        every { userDomain.getUserById(userId) } returns user
         every { userQueueTokenService.createUserQueueTokenWithValidation(user) } throws
                 RuntimeException("some error inside")
 
@@ -56,7 +56,7 @@ class UserQueueTokenCreateApplicationTest {
         val userId = UUID.randomUUID()
         val user = mockk<User>()
         val expectedToken = "token"
-        every { userService.getUserById(userId) } returns user
+        every { userDomain.getUserById(userId) } returns user
         every { userQueueTokenService.createUserQueueTokenWithValidation(user) } returns mockk {
             every { token } returns expectedToken
         }
