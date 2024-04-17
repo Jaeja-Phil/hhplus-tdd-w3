@@ -27,7 +27,7 @@ class PerformanceSeatPayApplication(
         val confirmAppliedPerformanceSeat = performanceSeat.confirm(userQueueToken.token)
         val updatedPerformanceSeat = performanceSeatDomain.update(confirmAppliedPerformanceSeat)
         // expire user-queue-token
-        userQueueTokenDomain.expire(userQueueToken)
+        userQueueTokenDomain.expireUserQueueToken(userQueueToken)
 
         // return booked performance seat information
         return PerformanceSeatResponse.from(updatedPerformanceSeat)

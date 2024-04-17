@@ -26,7 +26,7 @@ class TokenInterceptor(
         }
 
         // if token is valid, set current user id to request attribute
-        val userQueueToken = userQueueTokenDomain.getByToken(token!!) ?: return false // token is valid, so it should not be null
+        val userQueueToken = userQueueTokenDomain.getUseQueueTokenByToken(token!!) ?: return false // token is valid, so it should not be null
         request.setAttribute("currentUserQueueToken", userQueueToken)
 
         return true
@@ -36,7 +36,7 @@ class TokenInterceptor(
         if (token == null) {
             return false
         }
-        return userQueueTokenDomain.getByToken(token)?.status == UserQueueTokenStatus.IN_PROGRESS
+        return userQueueTokenDomain.getUseQueueTokenByToken(token)?.status == UserQueueTokenStatus.IN_PROGRESS
     }
 
     private fun isTokenRequired(request: HttpServletRequest): Boolean {

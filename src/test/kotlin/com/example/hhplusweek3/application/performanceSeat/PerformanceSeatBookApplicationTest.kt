@@ -9,6 +9,7 @@ import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
+import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
@@ -25,9 +26,11 @@ import java.util.*
 class PerformanceSeatBookApplicationTest {
     private val concertPerformanceDomain: ConcertDomain = mockk()
     private val performanceSeatDomain = spyk(mockk<PerformanceSeatDomain>())
+    private val userQueueTokenDomain = mockk<UserQueueTokenDomain>()
     private val performanceSeatBookApplication = PerformanceSeatBookApplication(
         concertDomain = concertPerformanceDomain,
-        performanceSeatDomain = performanceSeatDomain
+        performanceSeatDomain = performanceSeatDomain,
+        userQueueTokenDomain = userQueueTokenDomain
     )
 
     @Test
@@ -73,6 +76,34 @@ class PerformanceSeatBookApplicationTest {
     }
 
     @Test
+    fun `run - should raise error when there is an existing token reservation`() {
+        // given
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = 1
+        )
+        val userQueueToken = mockk<UserQueueToken>() { every { id } returns 1L }
+        val concertPerformance = mockk<ConcertPerformance>()
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
+        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
+            every { isAvailable() } returns true
+        }
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns listOf(
+            mockk() {
+                every { id } returns 1L
+            }
+        )
+
+        // when
+        val thrown = assertThrows<BadRequestException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
+
+        // then
+        assertEquals("User can only book 1 seat with 1 token.", thrown.message)
+    }
+
+    @Test
     fun `run - should create performance seat when performance seat is not found`() {
         // given
         val request = PerformanceSeatBookRequest(concertPerformanceId = 1, seatNumber = 1)
@@ -101,6 +132,8 @@ class PerformanceSeatBookApplicationTest {
         }
         every { performanceSeatDomain.createPerformanceSeat(any()) } returns performanceSeat
         every { performanceSeatDomain.update(any()) } returns performanceSeat
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every { userQueueTokenDomain.createTokenReservation(any(), any()) } returns mockk()
 
         // when
         val result = performanceSeatBookApplication.run(request, userQueueToken)
@@ -140,6 +173,8 @@ class PerformanceSeatBookApplicationTest {
         }
         every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns performanceSeat
         every { performanceSeatDomain.update(any()) } returns performanceSeat
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every { userQueueTokenDomain.createTokenReservation(any(), any()) } returns mockk()
 
         // when
         val result = performanceSeatBookApplication.run(request, userQueueToken)

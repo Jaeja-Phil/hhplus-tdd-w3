@@ -73,7 +73,7 @@ class TokenInterceptorTest {
         every { tokenInterceptor["isTokenRequired"](request) } answers { true }
         every { tokenInterceptor["getToken"](request) } answers { "token" }
         every { tokenInterceptor["isValidToken"]("token") } answers { true }
-        every { userQueueTokenDomain.getByToken("token") } answers { userQueueToken }
+        every { userQueueTokenDomain.getUseQueueTokenByToken("token") } answers { userQueueToken }
         every { request.setAttribute("currentUserQueueToken", userQueueToken) } answers { Unit }
 
         // when
@@ -84,7 +84,7 @@ class TokenInterceptorTest {
         verify(exactly = 1) { tokenInterceptor["isTokenRequired"](request) }
         verify(exactly = 1) { tokenInterceptor["getToken"](request) }
         verify(exactly = 1) { tokenInterceptor["isValidToken"]("token") }
-        verify(exactly = 1) { userQueueTokenDomain.getByToken("token") }
+        verify(exactly = 1) { userQueueTokenDomain.getUseQueueTokenByToken("token") }
         verify(exactly = 1) { request.setAttribute("currentUserQueueToken", userQueueToken) }
     }
 }
