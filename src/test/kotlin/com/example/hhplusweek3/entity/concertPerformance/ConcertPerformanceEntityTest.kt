@@ -1,6 +1,7 @@
 package com.example.hhplusweek3.entity.concertPerformance
 
 import com.example.hhplusweek3.entity.concert.ConcertEntity
+import com.example.hhplusweek3.entity.concert.ConcertPerformanceEntity
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

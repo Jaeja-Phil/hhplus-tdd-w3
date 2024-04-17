@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.entity.performanceSeat
 
-import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
+import com.example.hhplusweek3.entity.concert.ConcertPerformanceEntity
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

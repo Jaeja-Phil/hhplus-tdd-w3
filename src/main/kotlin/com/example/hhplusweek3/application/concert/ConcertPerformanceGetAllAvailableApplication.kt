@@ -1,4 +1,4 @@
-package com.example.hhplusweek3.application.concertPerformance
+package com.example.hhplusweek3.application.concert
 
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
 import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain

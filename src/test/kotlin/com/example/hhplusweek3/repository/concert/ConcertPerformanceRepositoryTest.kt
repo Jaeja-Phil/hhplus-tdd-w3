@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.repository.concert
 
 import com.example.hhplusweek3.entity.concert.ConcertEntity
-import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
+import com.example.hhplusweek3.entity.concert.ConcertPerformanceEntity
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals

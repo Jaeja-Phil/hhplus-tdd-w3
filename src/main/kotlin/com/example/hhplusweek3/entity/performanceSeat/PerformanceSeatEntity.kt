@@ -2,7 +2,7 @@ package com.example.hhplusweek3.entity.performanceSeat
 
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatCreateObject
-import com.example.hhplusweek3.entity.concertPerformance.ConcertPerformanceEntity
+import com.example.hhplusweek3.entity.concert.ConcertPerformanceEntity
 import com.example.hhplusweek3.entity.user.UserEntity
 import jakarta.persistence.*
 import java.time.LocalDateTime

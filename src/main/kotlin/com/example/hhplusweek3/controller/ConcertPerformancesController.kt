@@ -1,6 +1,6 @@
 package com.example.hhplusweek3.controller
 
-import com.example.hhplusweek3.application.concertPerformance.ConcertPerformanceGetAllAvailableApplication
+import com.example.hhplusweek3.application.concert.ConcertPerformanceGetAllAvailableApplication
 import com.example.hhplusweek3.controller.apiSpec.ConcertPerformanceApiSpec
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
 import org.springframework.http.ResponseEntity
