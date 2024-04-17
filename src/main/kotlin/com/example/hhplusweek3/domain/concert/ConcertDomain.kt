@@ -1,4 +1,4 @@
-package com.example.hhplusweek3.service.concert
+package com.example.hhplusweek3.domain.concert
 
 import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.domain.concert.ConcertCreateObject
@@ -6,7 +6,7 @@ import com.example.hhplusweek3.repository.concert.ConcertRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ConcertService(
+class ConcertDomain(
     private val concertRepository: ConcertRepository
 ) {
     fun getConcerts(): List<Concert> {

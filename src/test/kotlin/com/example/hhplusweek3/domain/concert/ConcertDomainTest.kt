@@ -1,15 +1,14 @@
-package com.example.hhplusweek3.service.concert
+package com.example.hhplusweek3.domain.concert
 
-import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.repository.concert.ConcertRepository
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class ConcertServiceTest {
+class ConcertDomainTest {
     private val concertRepository = mockk<ConcertRepository>()
-    private val concertService = ConcertService(concertRepository)
+    private val concertDomain = ConcertDomain(concertRepository)
 
     @Test
     fun `getConcerts - should return list of Concert`() {
@@ -18,7 +17,7 @@ class ConcertServiceTest {
          every { concertRepository.findAll() } returns listOf(concert)
 
         // when
-         val result = concertService.getConcerts()
+         val result = concertDomain.getConcerts()
 
         // then
          assertEquals(1, result.size)
@@ -32,7 +31,7 @@ class ConcertServiceTest {
          every { concertRepository.save(any()) } returns concert
 
         // when
-         val result = concertService.createConcert("Concert 1")
+         val result = concertDomain.createConcert("Concert 1")
 
         // then
          assertEquals(Concert(1, "Concert 1"), result)
