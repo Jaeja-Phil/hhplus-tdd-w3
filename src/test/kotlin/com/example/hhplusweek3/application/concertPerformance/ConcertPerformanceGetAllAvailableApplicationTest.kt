@@ -2,8 +2,8 @@ package com.example.hhplusweek3.application.concertPerformance
 
 import com.example.hhplusweek3.application.concert.ConcertPerformanceGetAllAvailableApplication
 import com.example.hhplusweek3.controller.response.ConcertPerformanceResponse
+import com.example.hhplusweek3.domain.concert.ConcertDomain
 import com.example.hhplusweek3.domain.concert.ConcertPerformance
-import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class ConcertPerformanceGetAllAvailableApplicationTest {
-    private val concertPerformanceDomain = mockk<ConcertPerformanceDomain>()
-    private val concertPerformanceGetAllAvailableApplication = ConcertPerformanceGetAllAvailableApplication(concertPerformanceDomain)
+    private val concertDomain = mockk<ConcertDomain>()
+    private val concertPerformanceGetAllAvailableApplication = ConcertPerformanceGetAllAvailableApplication(concertDomain)
     private val now = LocalDateTime.now()
 
     @Test
@@ -27,7 +27,7 @@ class ConcertPerformanceGetAllAvailableApplicationTest {
             )
         )
         every {
-            concertPerformanceDomain.getAvailableConcertPerformances(100L)
+            concertDomain.getAvailableConcertPerformances(100L)
         } returns concertPerformances
 
         // When

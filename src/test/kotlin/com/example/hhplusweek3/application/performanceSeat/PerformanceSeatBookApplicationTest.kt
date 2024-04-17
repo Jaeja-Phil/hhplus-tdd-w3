@@ -3,15 +3,15 @@ package com.example.hhplusweek3.application.performanceSeat
 import com.example.hhplusweek3.controller.request.PerformanceSeatBookRequest
 import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
 import com.example.hhplusweek3.domain.concert.Concert
+import com.example.hhplusweek3.domain.concert.ConcertDomain
 import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
+import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
-import com.example.hhplusweek3.domain.concert.ConcertPerformanceDomain
-import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -23,10 +23,10 @@ import java.time.LocalDateTime
 import java.util.*
 
 class PerformanceSeatBookApplicationTest {
-    private val concertPerformanceDomain: ConcertPerformanceDomain = mockk()
+    private val concertPerformanceDomain: ConcertDomain = mockk()
     private val performanceSeatDomain = spyk(mockk<PerformanceSeatDomain>())
     private val performanceSeatBookApplication = PerformanceSeatBookApplication(
-        concertPerformanceDomain = concertPerformanceDomain,
+        concertDomain = concertPerformanceDomain,
         performanceSeatDomain = performanceSeatDomain
     )
 
@@ -38,7 +38,7 @@ class PerformanceSeatBookApplicationTest {
             seatNumber = 1
         )
         val userQueueToken = mockk<UserQueueToken>()
-        every { concertPerformanceDomain.getById(any()) } returns null
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns null
 
         // when
         val thrown = assertThrows<NotFoundException> {
@@ -58,7 +58,7 @@ class PerformanceSeatBookApplicationTest {
         )
         val userQueueToken = mockk<UserQueueToken>()
         val concertPerformance = mockk<ConcertPerformance>()
-        every { concertPerformanceDomain.getById(any()) } returns concertPerformance
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
         every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
             every { isAvailable() } returns false
         }
@@ -90,7 +90,7 @@ class PerformanceSeatBookApplicationTest {
             concert = concert,
             performanceDateTime = LocalDateTime.now()
         )
-        every { concertPerformanceDomain.getById(any()) } returns concertPerformanceToReturn
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformanceToReturn
         every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
@@ -129,7 +129,7 @@ class PerformanceSeatBookApplicationTest {
             concert = concert,
             performanceDateTime = LocalDateTime.now()
         )
-        every { concertPerformanceDomain.getById(any()) } returns concertPerformanceToReturn
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformanceToReturn
         val performanceSeat = mockk<PerformanceSeat>() {
             every { id } returns 1
             every { isAvailable() } returns true
