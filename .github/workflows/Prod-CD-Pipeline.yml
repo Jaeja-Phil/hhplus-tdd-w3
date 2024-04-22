@@ -62,6 +62,9 @@ jobs:
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Build JAR file
+        run: ./gradlew bootJar
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
