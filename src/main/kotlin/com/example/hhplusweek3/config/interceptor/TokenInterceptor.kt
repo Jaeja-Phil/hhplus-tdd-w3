@@ -1,7 +1,7 @@
 package com.example.hhplusweek3.config.interceptor
 
-import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
+import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
@@ -49,6 +49,7 @@ class TokenInterceptor(
             "/user-queue-tokens" to RequestMethod.POST.name,
             "/users/*/charge" to RequestMethod.POST.name,
             "/users" to RequestMethod.POST.name,
+            "/health/check" to RequestMethod.GET.name,
         )
         val requestUri = request.requestURI
         val requestMethod = request.method
