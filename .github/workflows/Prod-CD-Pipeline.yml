@@ -7,8 +7,8 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REGISTRY: 891377216292.dkr.ecr.ap-northeast-2.amazonaws.com/hhplus-prod:latest
-  ECR_REPOSITORY: hhplus-prod
+  ECR_REGISTRY: 891377216292.dkr.ecr.ap-northeast-2.amazonaws.com/prod-hhplus-ecr
+  ECR_REPOSITORY: prod-hhplus-ecr
 
 jobs:
 #  test:
@@ -77,7 +77,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: prod-${{ github.sha }}
         run: |
-          docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --push . 
+          docker buildx create --name mybuilder --use
+          docker buildx inspect --bootstrap
+          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --push . 
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Render ECS task-definition
@@ -92,6 +94,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
-          service: hhplus-prod
-          cluster: hhplus-cluster-prod
+          service: hhplus-prod-ecr-service
+          cluster: prod-hhplus-ecr-cluster
           wait-for-service-stability: true
