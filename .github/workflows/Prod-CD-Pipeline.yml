@@ -94,6 +94,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
-          service: hhplus-prod-ecr-service
+          service: prod-hhplus-ecr-service
           cluster: prod-hhplus-ecr-cluster
           wait-for-service-stability: true
