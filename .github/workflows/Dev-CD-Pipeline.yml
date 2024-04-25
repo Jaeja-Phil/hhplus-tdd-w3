@@ -7,7 +7,8 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REGISTRY: [TODO] add ecr registry for dev
+  # TODO. ECR registry for dev
+  ECR_REGISTRY: helloworld
   ECR_REPOSITORY: dev-hhplus-ecr
 
 jobs:
