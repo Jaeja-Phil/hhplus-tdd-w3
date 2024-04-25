@@ -39,4 +39,9 @@ class ConcertRepositoryTest {
         // then
         assertEquals(Concert(1, "Concert 1"), result)
     }
+
+    @Test
+    fun `failing test case`() {
+        assertEquals(1, 2)
+    }
 }
