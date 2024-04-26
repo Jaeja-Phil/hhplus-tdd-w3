@@ -1,3 +1,19 @@
+## 0-1. 브랜치 전략
+
+- `main`: 운영 브랜치
+- `develop`: 개발 브랜치
+  - 사내 테스트 서버용 브랜치로도 사용 
+  - `feature/{feature-name}`: 기능 개발 브랜치, develop에서 분기
+- `release/{version}`: 배포 전 브랜치, develop에서 분기
+
+## 0-2. Lint
+
+- ktlint 적용
+- `./gradlew ktlintCheck`로 코드 스타일 확인
+
+> ktlint를 PR시 적용하려고 했으나 수정해야 할 스타일이 너무 많아서 PR시 적용하지 않음
+> 추후 일관된 스타일을 추출하고 한번에 chore로 적용
+
 ## 1. ERD
 
 ![ERD](static/ERD.png)
