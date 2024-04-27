@@ -9,6 +9,6 @@ class HealthCheckController {
 
     @RequestMapping("/check")
     fun check(): String {
-        return "OK"
+        return "TEST PR"
     }
 }
