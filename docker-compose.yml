@@ -1,5 +1,13 @@
 version: '3.7'
 services:
+  redis:
+    container_name: hhplus-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - hhplus-network
+    restart: always
   api:
     container_name: hhplus-app
     image: hhplus-app
@@ -10,7 +18,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-        - .:/src
+      - .:/src
+    depends_on:
+      - redis
     networks:
       - hhplus-network
 networks:
