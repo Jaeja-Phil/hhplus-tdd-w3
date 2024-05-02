@@ -23,6 +23,7 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 import java.util.*
 
+// TODO: fix failing test cases
 class PerformanceSeatBookApplicationTest {
     private val concertPerformanceDomain: ConcertDomain = mockk()
     private val performanceSeatDomain = spyk(mockk<PerformanceSeatDomain>())
