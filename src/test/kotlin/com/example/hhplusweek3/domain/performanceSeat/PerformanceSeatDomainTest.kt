@@ -7,11 +7,16 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.springframework.data.redis.core.RedisTemplate
 import java.time.LocalDateTime
 
 class PerformanceSeatDomainTest {
     private val performanceSeatRepository = mockk<PerformanceSeatRepository>()
-    private val performanceSeatDomain = PerformanceSeatDomain(performanceSeatRepository)
+    private val redisTemplate = mockk<RedisTemplate<String, String>>()
+    private val performanceSeatDomain = PerformanceSeatDomain(
+        performanceSeatRepository,
+        redisTemplate
+    )
 
     @Test
     fun `getAllAvailableSeatNumbersByConcertPerformance - should return available seat numbers`() {

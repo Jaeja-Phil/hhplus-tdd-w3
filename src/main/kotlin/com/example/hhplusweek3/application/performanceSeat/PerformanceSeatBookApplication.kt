@@ -35,13 +35,13 @@ class PerformanceSeatBookApplication(
             throw BadRequestException("User can only book 1 seat with 1 token.")
         }
 
-        val result = runCatching {
-            // 3. check for performance seat availability & lock redis key
-            performanceSeatDomain.preOccupy(
-                concertPerformanceId = request.concertPerformanceId,
-                seatNumber = request.seatNumber
-            )
+        // 3. check for performance seat availability & lock redis key
+        performanceSeatDomain.preOccupy(
+            concertPerformanceId = request.concertPerformanceId,
+            seatNumber = request.seatNumber
+        )
 
+        val result = runCatching {
             // 4. get or create performance seat
             val performanceSeat = performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
                 seatNumber = request.seatNumber,
@@ -59,8 +59,13 @@ class PerformanceSeatBookApplication(
             val updatedPerformanceSeat = performanceSeatDomain.update(bookedPerformanceSeat)
             PerformanceSeatResponse.from(updatedPerformanceSeat)
         }
-
+        println("result: $result")
+        println("result.isSuccess: ${result.isSuccess}")
+        println("result.isFailure: ${result.isFailure}")
         result.onFailure {
+            println("am i here?")
+            println(it)
+            println(it.message)
             // 6. release redis key
             performanceSeatDomain.releasePreOccupied(
                 concertPerformanceId = request.concertPerformanceId,

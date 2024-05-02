@@ -1,18 +1,15 @@
 package com.example.hhplusweek3.application.performanceSeat
 
 import com.example.hhplusweek3.controller.request.PerformanceSeatBookRequest
-import com.example.hhplusweek3.controller.response.PerformanceSeatResponse
-import com.example.hhplusweek3.domain.concert.Concert
 import com.example.hhplusweek3.domain.concert.ConcertDomain
 import com.example.hhplusweek3.domain.concert.ConcertPerformance
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeat
 import com.example.hhplusweek3.domain.performanceSeat.PerformanceSeatDomain
-import com.example.hhplusweek3.domain.user.User
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueToken
 import com.example.hhplusweek3.domain.userQueueToken.UserQueueTokenDomain
-import com.example.hhplusweek3.entity.userQueueToken.UserQueueTokenStatus
 import com.example.hhplusweek3.error.BadRequestException
 import com.example.hhplusweek3.error.NotFoundException
+import com.example.hhplusweek3.repository.performanceSeat.PerformanceSeatRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -20,13 +17,14 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
-import java.util.*
+import org.springframework.data.redis.core.RedisTemplate
 
 // TODO: fix failing test cases
 class PerformanceSeatBookApplicationTest {
-    private val concertPerformanceDomain: ConcertDomain = mockk()
-    private val performanceSeatDomain = spyk(mockk<PerformanceSeatDomain>())
+    private val concertPerformanceDomain = mockk<ConcertDomain>()
+    private val performanceSeatRepository = mockk<PerformanceSeatRepository>()
+    private val redisTemplate = mockk<RedisTemplate<String, String>>()
+    private val performanceSeatDomain = spyk(PerformanceSeatDomain(performanceSeatRepository, redisTemplate))
     private val userQueueTokenDomain = mockk<UserQueueTokenDomain>()
     private val performanceSeatBookApplication = PerformanceSeatBookApplication(
         concertDomain = concertPerformanceDomain,
@@ -54,18 +52,18 @@ class PerformanceSeatBookApplicationTest {
     }
 
     @Test
-    fun `run - should throw BadRequestException when performance seat is not available`() {
+    fun `run - should throw BadRequestException when seat number is invalid`() {
         // given
+        val totalSeats = 10
         val request = PerformanceSeatBookRequest(
             concertPerformanceId = 1,
-            seatNumber = 1
+            seatNumber = totalSeats + 1
         )
         val userQueueToken = mockk<UserQueueToken>()
-        val concertPerformance = mockk<ConcertPerformance>()
-        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
-        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
-            every { isAvailable() } returns false
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns totalSeats
         }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
 
         // when
         val thrown = assertThrows<BadRequestException> {
@@ -73,27 +71,25 @@ class PerformanceSeatBookApplicationTest {
         }
 
         // then
-        assertEquals("Performance seat is not available.", thrown.message)
+        assertEquals("Invalid seat number.", thrown.message)
     }
 
     @Test
-    fun `run - should raise error when there is an existing token reservation`() {
+    fun `run - should throw BadRequestException when tokenReservation is present`() {
         // given
+        val seatNumber = 1
         val request = PerformanceSeatBookRequest(
             concertPerformanceId = 1,
-            seatNumber = 1
+            seatNumber = seatNumber
         )
-        val userQueueToken = mockk<UserQueueToken>() { every { id } returns 1L }
-        val concertPerformance = mockk<ConcertPerformance>()
-        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
-        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns mockk {
-            every { isAvailable() } returns true
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
         }
-        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns listOf(
-            mockk() {
-                every { id } returns 1L
-            }
-        )
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns listOf(mockk())
 
         // when
         val thrown = assertThrows<BadRequestException> {
@@ -105,84 +101,359 @@ class PerformanceSeatBookApplicationTest {
     }
 
     @Test
-    fun `run - should create performance seat when performance seat is not found`() {
+    fun `run - should throw exception when preOccupying performance seat fails`() {
         // given
-        val request = PerformanceSeatBookRequest(concertPerformanceId = 1, seatNumber = 1)
-        val user = User(id = UUID.randomUUID(), balance = 0.0)
-        val userQueueToken = UserQueueToken(
-            id = 1L,
-            user = user,
-            token = UUID.randomUUID().toString(),
-            status = UserQueueTokenStatus.IN_PROGRESS
+        val seatNumber = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = seatNumber
         )
-        val concert = Concert(id = 1, name = "concert")
-        val concertPerformanceToReturn = ConcertPerformance(
-            id = 1,
-            maxSeats = 10,
-            concert = concert,
-            performanceDateTime = LocalDateTime.now()
-        )
-        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformanceToReturn
-        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns null
-        val performanceSeat = mockk<PerformanceSeat>() {
-            every { id } returns 1
-            every { book(any()) } returns this
-            every { concertPerformance } returns concertPerformanceToReturn
-            every { seatNumber } returns 1
-            every { booked } returns false
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
         }
-        every { performanceSeatDomain.createPerformanceSeat(any()) } returns performanceSeat
-        every { performanceSeatDomain.update(any()) } returns performanceSeat
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
         every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
-        every { userQueueTokenDomain.createTokenReservation(any(), any()) } returns mockk()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } throws RuntimeException("fail in preOccupying performance seat")
 
         // when
-        val result = performanceSeatBookApplication.run(request, userQueueToken)
+        val thrown = assertThrows<RuntimeException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
 
         // then
-        verify(exactly = 1) { performanceSeatDomain.createPerformanceSeat(any()) }
-        verify(exactly = 1) { performanceSeatDomain.update(any()) }
-        assertEquals(PerformanceSeatResponse.from(performanceSeat), result)
+        assertEquals("fail in preOccupying performance seat", thrown.message)
     }
 
     @Test
-    fun `run - should not create performance seat when performance seat is found`() {
+    fun `run - should release redis key and throw exception when get create performance seat fails`() {
         // given
-        val request = PerformanceSeatBookRequest(concertPerformanceId = 1, seatNumber = 1)
-        val user = User(id = UUID.randomUUID(), balance = 0.0)
-        val userQueueToken = UserQueueToken(
-            id = 1L,
-            user = user,
-            token = UUID.randomUUID().toString(),
-            status = UserQueueTokenStatus.IN_PROGRESS
+        val seatNumber = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = seatNumber
         )
-        val concert = Concert(id = 1, name = "concert")
-        val concertPerformanceToReturn = ConcertPerformance(
-            id = 1,
-            maxSeats = 10,
-            concert = concert,
-            performanceDateTime = LocalDateTime.now()
-        )
-        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformanceToReturn
-        val performanceSeat = mockk<PerformanceSeat>() {
-            every { id } returns 1
-            every { isAvailable() } returns true
-            every { book(any()) } returns this
-            every { concertPerformance } returns concertPerformanceToReturn
-            every { seatNumber } returns 1
-            every { booked } returns false
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
         }
-        every { performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(any(), any()) } returns performanceSeat
-        every { performanceSeatDomain.update(any()) } returns performanceSeat
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
         every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
-        every { userQueueTokenDomain.createTokenReservation(any(), any()) } returns mockk()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } returns Unit
+        every {
+            performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
+                any(),
+                any()
+            )
+        } returns null
+        every {
+            performanceSeatDomain.createPerformanceSeat(
+                any()
+            )
+        } throws RuntimeException("fail in get performance seat")
+        every {
+            performanceSeatDomain.releasePreOccupied(
+                any(),
+                any()
+            )
+        } returns Unit
+
+        // when
+        val thrown = assertThrows<RuntimeException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
+
+        // then
+        assertEquals("fail in get performance seat", thrown.message)
+        verify(exactly = 1) {
+            performanceSeatDomain.releasePreOccupied(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+        verify(exactly = 1) {
+            performanceSeatDomain.preOccupy(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+    }
+
+    @Test
+    fun `run - should release redis key and throw exception when create performance seat fails`() {
+        // given
+        val seatNumber = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = seatNumber
+        )
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
+        }
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } returns Unit
+        every {
+            performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
+                any(),
+                any()
+            )
+        } returns null
+        every {
+            performanceSeatDomain.createPerformanceSeat(
+                any()
+            )
+        } throws RuntimeException("fail in create performance seat")
+        every {
+            performanceSeatDomain.releasePreOccupied(
+                any(),
+                any()
+            )
+        } returns Unit
+
+        // when
+        val thrown = assertThrows<RuntimeException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
+
+        // then
+        assertEquals("fail in create performance seat", thrown.message)
+        verify(exactly = 1) {
+            performanceSeatDomain.releasePreOccupied(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+        verify(exactly = 1) {
+            performanceSeatDomain.preOccupy(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+    }
+
+    @Test
+    fun `run - should release redis key and throw exception when creating token reservation fails`() {
+        // given
+        val seatNumber = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = seatNumber
+        )
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
+        }
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        val performanceSeat = mockk<PerformanceSeat>()
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } returns Unit
+        every {
+            performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
+                any(),
+                any()
+            )
+        } returns performanceSeat
+        every {
+            performanceSeatDomain.createPerformanceSeat(
+                any()
+            )
+        } returns performanceSeat
+        every {
+            userQueueTokenDomain.createTokenReservation(
+                any(),
+                any()
+            )
+        } throws RuntimeException("fail in creating token reservation")
+        every {
+            performanceSeatDomain.releasePreOccupied(
+                any(),
+                any()
+            )
+        } returns Unit
+
+        // when
+        val thrown = assertThrows<RuntimeException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
+
+        // then
+        assertEquals("fail in creating token reservation", thrown.message)
+        verify(exactly = 1) {
+            performanceSeatDomain.releasePreOccupied(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+        verify(exactly = 1) {
+            performanceSeatDomain.preOccupy(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+    }
+
+    @Test
+    fun `run - should release redis key and throw exception when updating performance seat fails`() {
+        // given
+        val seatNumber = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = seatNumber
+        )
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
+        }
+        val concertPerformance = mockk<ConcertPerformance>() {
+            every { maxSeats } returns seatNumber + 1
+        }
+        val performanceSeat = mockk<PerformanceSeat>() {
+            every { book(any()) } returns this
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformance
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } returns Unit
+        every {
+            performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
+                any(),
+                any()
+            )
+        } returns performanceSeat
+        every {
+            performanceSeatDomain.createPerformanceSeat(
+                any()
+            )
+        } returns performanceSeat
+        every {
+            userQueueTokenDomain.createTokenReservation(
+                any(),
+                any()
+            )
+        } returns mockk()
+        every {
+            performanceSeatDomain.update(
+                any()
+            )
+        } throws RuntimeException("fail in updating performance seat")
+        every {
+            performanceSeatDomain.releasePreOccupied(
+                any(),
+                any()
+            )
+        } returns Unit
+
+        // when
+        val thrown = assertThrows<RuntimeException> {
+            performanceSeatBookApplication.run(request, userQueueToken)
+        }
+
+        // then
+        assertEquals("fail in updating performance seat", thrown.message)
+        verify(exactly = 1) {
+            performanceSeatDomain.releasePreOccupied(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+        verify(exactly = 1) {
+            performanceSeatDomain.preOccupy(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
+    }
+
+    @Test
+    fun `run - should return booked performance seat`() {
+        // given
+        val numberOfSeats = 1
+        val request = PerformanceSeatBookRequest(
+            concertPerformanceId = 1,
+            seatNumber = numberOfSeats
+        )
+        val userQueueToken = mockk<UserQueueToken>() {
+            every { id } returns 1L
+        }
+        val concertPerformanceMock = mockk<ConcertPerformance>() {
+            every { id } returns 1L
+            every { maxSeats } returns numberOfSeats + 1
+        }
+        val performanceSeat = mockk<PerformanceSeat>() {
+            every { id } returns 1L
+            every { concertPerformance } returns concertPerformanceMock
+            every { seatNumber } returns numberOfSeats
+            every { booked } returns false
+            every { book(any()) } returns this
+        }
+        every { concertPerformanceDomain.getConcertPerformanceById(any()) } returns concertPerformanceMock
+        every { userQueueTokenDomain.getTokenReservationsByUserQueueTokenId(any()) } returns emptyList()
+        every {
+            performanceSeatDomain.preOccupy(
+                any(),
+                any()
+            )
+        } returns Unit
+        every {
+            performanceSeatDomain.getBySeatNumberAndConcertPerformanceId(
+                any(),
+                any()
+            )
+        } returns performanceSeat
+        every {
+            userQueueTokenDomain.createTokenReservation(
+                any(),
+                any()
+            )
+        } returns mockk()
+        every {
+            performanceSeatDomain.update(
+                any()
+            )
+        } returns performanceSeat
 
         // when
         val result = performanceSeatBookApplication.run(request, userQueueToken)
 
         // then
-        verify(exactly = 0) { performanceSeatDomain.createPerformanceSeat(any()) }
-        verify(exactly = 1) { performanceSeatDomain.update(any()) }
-        assertEquals(PerformanceSeatResponse.from(performanceSeat), result)
+        verify(exactly = 0) {
+            performanceSeatDomain.releasePreOccupied(
+                concertPerformanceId = request.concertPerformanceId,
+                seatNumber = request.seatNumber
+            )
+        }
     }
 }
